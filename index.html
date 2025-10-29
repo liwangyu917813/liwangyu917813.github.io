@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -253,7 +252,8 @@
                     <!-- 其他分类 -->
                     <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer scale-hover" data-category="other">
                         <div class="relative">
-                            <div class="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                            <img id="otherCategoryImage" src="" alt="其他" class="w-full h-48 object-cover hidden">
+                            <div id="otherCategoryPlaceholder" class="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                 <i class="fa fa-folder-open text-gray-400 text-4xl"></i>
                             </div>
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
@@ -480,13 +480,43 @@
             nextImage: document.getElementById('nextImage'),
             submitModal: document.getElementById('submitModal'),
             modalContent: document.getElementById('modalContent'),
-            closeModal: document.getElementById('closeModal')
+            closeModal: document.getElementById('closeModal'),
+            otherCategoryImage: document.getElementById('otherCategoryImage'),
+            otherCategoryPlaceholder: document.getElementById('otherCategoryPlaceholder')
         };
 
         // 初始化
         function init() {
             bindEvents();
             checkAgeVerification();
+            setupOtherCategoryCover();
+        }
+
+        // 设置"其他"分类封面
+        function setupOtherCategoryCover() {
+            if (imageData.other && imageData.other.length > 0) {
+                // 随机选择一张图片
+                const randomIndex = Math.floor(Math.random() * imageData.other.length);
+                const randomImage = imageData.other[randomIndex];
+                
+                // 创建图片元素并设置加载处理
+                const img = new Image();
+                img.src = randomImage;
+                
+                img.onload = function() {
+                    // 图片加载成功，显示图片
+                    elements.otherCategoryImage.src = randomImage;
+                    elements.otherCategoryImage.classList.remove('hidden');
+                    elements.otherCategoryPlaceholder.classList.add('hidden');
+                };
+                
+                img.onerror = function() {
+                    // 图片加载失败，显示默认图标
+                    console.log('图片加载失败，使用默认图标');
+                    elements.otherCategoryImage.classList.add('hidden');
+                    elements.otherCategoryPlaceholder.classList.remove('hidden');
+                };
+            }
         }
 
         // 绑定事件
@@ -514,6 +544,8 @@
             // 画廊页事件
             elements.backToCategories.addEventListener('click', () => {
                 showPage('categoryPage');
+                // 返回分类页时重新设置"其他"分类封面
+                setTimeout(setupOtherCategoryCover, 100);
             });
             elements.sortSelect.addEventListener('change', () => {
                 resetGallery();
@@ -571,6 +603,8 @@
             if (elements.ageSelect.value === 'over' && elements.agreeTerms.checked) {
                 localStorage.setItem('ageVerified', 'true');
                 showPage('categoryPage');
+                // 显示分类页时设置"其他"分类封面
+                setTimeout(setupOtherCategoryCover, 100);
             }
         }
 
@@ -579,6 +613,8 @@
             const isVerified = localStorage.getItem('ageVerified') === 'true';
             if (isVerified) {
                 showPage('categoryPage');
+                // 显示分类页时设置"其他"分类封面
+                setTimeout(setupOtherCategoryCover, 100);
             } else {
                 showPage('welcomePage');
             }
