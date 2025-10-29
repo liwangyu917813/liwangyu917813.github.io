@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>王府小吃街</title>
+    <title>王府必吃图鉴</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <script>
@@ -98,6 +98,25 @@
                 bottom: 0;
                 background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.4) 100%);
             }
+            .category-bg {
+                background-image: url('https://aka.doubaocdn.com/s/S7uj1vOwEi?alice_filename=R-C.85ceab1fa92d4a198816d08f9b50d338.jpeg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+                position: relative;
+            }
+            .category-overlay {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.8) 100%);
+            }
+            .modal-backdrop {
+                backdrop-filter: blur(8px);
+            }
         }
     </style>
 </head>
@@ -112,10 +131,10 @@
             <!-- 主要内容 -->
             <div class="text-center text-white z-10 px-4">
                 <h1 class="text-4xl md:text-6xl font-bold mb-8 fade-in">
-                    <i class="fa fa-cutlery mr-4"></i>王府小吃街
+                    <i class="fa fa-cutlery mr-4"></i>王府必吃图鉴
                 </h1>
                 <button id="enterBtn" class="bg-white text-primary px-10 py-5 rounded-full text-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl fade-in" style="animation-delay: 0.3s;">
-                    <i class="fa fa-arrow-right mr-2"></i>进入王府小吃街
+                    <i class="fa fa-arrow-right mr-2"></i>进入王府必吃图鉴
                 </button>
             </div>
         </div>
@@ -164,24 +183,32 @@
         </div>
 
         <!-- 目录页 -->
-        <div id="categoryPage" class="min-h-screen bg-white hidden">
+        <div id="categoryPage" class="min-h-screen category-bg relative hidden">
+            <!-- 背景覆盖层 -->
+            <div class="category-overlay"></div>
+            
             <!-- 顶部导航 -->
             <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <div class="flex items-center">
                             <i class="fa fa-th-large text-primary text-2xl mr-3"></i>
-                            <h1 class="text-xl font-bold text-gray-900">王府小吃街</h1>
+                            <h1 class="text-xl font-bold text-gray-900">王府必吃图鉴</h1>
                         </div>
-                        <button id="logoutBtn" class="text-gray-500 hover:text-red-600 transition-colors duration-300">
-                            <i class="fa fa-sign-out mr-1"></i>退出
-                        </button>
+                        <div class="flex items-center space-x-4">
+                            <button id="submitBtn" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-yellow-500 transition-colors duration-300">
+                                <i class="fa fa-upload mr-2"></i>图片投稿
+                            </button>
+                            <button id="logoutBtn" class="text-gray-500 hover:text-red-600 transition-colors duration-300">
+                                <i class="fa fa-sign-out mr-1"></i>退出
+                            </button>
+                        </div>
                     </div>
                 </div>
             </nav>
 
             <!-- 主要内容 -->
-            <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">选择图片分类</h2>
                     <p class="text-gray-600">点击下方分类查看更多图片</p>
@@ -196,7 +223,7 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div class="absolute bottom-4 left-4 text-white">
                                 <h3 class="text-xl font-bold">啵啵</h3>
-                                <p class="text-sm opacity-90">6张图片</p>
+                                <p class="text-sm opacity-90">7张图片</p>
                             </div>
                         </div>
                         <div class="p-4">
@@ -232,7 +259,7 @@
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div class="absolute bottom-4 left-4 text-white">
                                 <h3 class="text-xl font-bold">其他</h3>
-                                <p class="text-sm opacity-90">0张图片</p>
+                                <p class="text-sm opacity-90">5张图片</p>
                             </div>
                         </div>
                         <div class="p-4">
@@ -254,7 +281,7 @@
                         <button id="backToCategories" class="text-gray-600 hover:text-primary transition-colors duration-300">
                             <i class="fa fa-arrow-left mr-2"></i>返回分类
                         </button>
-                        <h1 id="galleryTitle" class="text-xl font-bold text-gray-900">王府小吃街</h1>
+                        <h1 id="galleryTitle" class="text-xl font-bold text-gray-900">王府必吃图鉴</h1>
                         <div class="w-16"></div> <!-- 占位 -->
                     </div>
                 </div>
@@ -364,6 +391,26 @@
                 </div>
             </div>
         </div>
+
+        <!-- 投稿弹窗 -->
+        <div id="submitModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa fa-upload text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">图片投稿</h3>
+                    <div class="bg-gray-100 rounded-lg p-6 mb-6">
+                        <p class="text-2xl font-bold text-center text-accent">钉钉搜</p>
+                        <p class="text-3xl font-bold text-center text-primary mt-2">liwangyu2023</p>
+                    </div>
+                    <p class="text-gray-600 mb-6">扫描或搜索上方钉钉号进行投稿</p>
+                    <button id="closeModal" class="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors duration-300">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -375,14 +422,21 @@
                 "https://aka.doubaocdn.com/s/F2Pu1vOv4T?alice_filename=",
                 "https://aka.doubaocdn.com/s/CNDi1vOv4T?alice_filename=",
                 "https://aka.doubaocdn.com/s/ZfNk1vOv4T?alice_filename=",
-                "https://aka.doubaocdn.com/s/9Wdi1vOv4T?alice_filename="
+                "https://aka.doubaocdn.com/s/9Wdi1vOv4T?alice_filename=",
+                "https://aka.doubaocdn.com/s/PYPV1vOw5e?alice_filename=%25E5%25B0%2591%25E7%25BE%25BD%25E7%2589%259B%25E9%2580%25BC.png"
             ],
             fafa: [
                 "https://aka.doubaocdn.com/s/EHym1vOv4T?alice_filename=",
                 "https://aka.doubaocdn.com/s/TVN31vOv4T?alice_filename=",
                 "https://aka.doubaocdn.com/s/JlJa1vOv4T?alice_filename="
             ],
-            other: []
+            other: [
+                "https://aka.doubaocdn.com/s/pSGV1vOwAr?alice_filename=11CE7FB8-ED1B-40FF-A6ED-74C638772273.png",
+                "https://aka.doubaocdn.com/s/Q5ig1vOwAr?alice_filename=1761573120760.jpeg",
+                "https://aka.doubaocdn.com/s/FE9S1vOwAr?alice_filename=1758378923481.jpeg",
+                "https://aka.doubaocdn.com/s/XOgR1vOwAr?alice_filename=%25E5%25B0%2591%25E7%25BE%25BD%25E7%2589%259B%25E9%2580%25BC_%25E5%2589%25AF%25E6%259C%25AC.png",
+                "https://aka.doubaocdn.com/s/pRkI1vOwAr?alice_filename=wef%25E5%25A4%25AA%25E5%25B8%25A6%25E6%25B4%25BE%25E4%25BA%2586.png"
+            ]
         };
 
         // 当前状态
@@ -405,6 +459,7 @@
             agreeTerms: document.getElementById('agreeTerms'),
             verifyBtn: document.getElementById('verifyBtn'),
             logoutBtn: document.getElementById('logoutBtn'),
+            submitBtn: document.getElementById('submitBtn'),
             categoryCards: document.querySelectorAll('.category-card'),
             backToCategories: document.getElementById('backToCategories'),
             galleryTitle: document.getElementById('galleryTitle'),
@@ -422,7 +477,10 @@
             viewerImageInfo: document.getElementById('viewerImageInfo'),
             closeViewer: document.getElementById('closeViewer'),
             prevImage: document.getElementById('prevImage'),
-            nextImage: document.getElementById('nextImage')
+            nextImage: document.getElementById('nextImage'),
+            submitModal: document.getElementById('submitModal'),
+            modalContent: document.getElementById('modalContent'),
+            closeModal: document.getElementById('closeModal')
         };
 
         // 初始化
@@ -445,6 +503,7 @@
 
             // 分类页事件
             elements.logoutBtn.addEventListener('click', handleLogout);
+            elements.submitBtn.addEventListener('click', openSubmitModal);
             elements.categoryCards.forEach(card => {
                 card.addEventListener('click', () => {
                     const category = card.dataset.category;
@@ -473,6 +532,14 @@
             elements.imageViewer.addEventListener('click', (e) => {
                 if (e.target === elements.imageViewer) {
                     closeImageViewer();
+                }
+            });
+
+            // 投稿弹窗事件
+            elements.closeModal.addEventListener('click', closeSubmitModal);
+            elements.submitModal.addEventListener('click', (e) => {
+                if (e.target === elements.submitModal) {
+                    closeSubmitModal();
                 }
             });
 
@@ -710,20 +777,49 @@
             }
         }
 
+        // 打开投稿弹窗
+        function openSubmitModal() {
+            elements.submitModal.classList.remove('hidden');
+            // 禁止背景滚动
+            document.body.style.overflow = 'hidden';
+            
+            // 添加动画效果
+            setTimeout(() => {
+                elements.modalContent.classList.remove('scale-95', 'opacity-0');
+                elements.modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // 关闭投稿弹窗
+        function closeSubmitModal() {
+            elements.modalContent.classList.remove('scale-100', 'opacity-100');
+            elements.modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                elements.submitModal.classList.add('hidden');
+                // 恢复背景滚动
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
         // 处理键盘事件
         function handleKeyPress(e) {
-            if (elements.imageViewer.classList.contains('hidden')) return;
-            
-            switch (e.key) {
-                case 'Escape':
-                    closeImageViewer();
-                    break;
-                case 'ArrowLeft':
-                    showPrevImage();
-                    break;
-                case 'ArrowRight':
-                    showNextImage();
-                    break;
+            if (!elements.imageViewer.classList.contains('hidden')) {
+                switch (e.key) {
+                    case 'Escape':
+                        closeImageViewer();
+                        break;
+                    case 'ArrowLeft':
+                        showPrevImage();
+                        break;
+                    case 'ArrowRight':
+                        showNextImage();
+                        break;
+                }
+            } else if (!elements.submitModal.classList.contains('hidden')) {
+                if (e.key === 'Escape') {
+                    closeSubmitModal();
+                }
             }
         }
 
