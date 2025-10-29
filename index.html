@@ -19,6 +19,37 @@
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
                     },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'hover-scale': 'hoverScale 0.3s ease-out',
+                        'fade-in-up': 'fadeInUp 0.5s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'modal-marquee': 'modalMarquee 10s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        hoverScale: {
+                            '0%': { transform: 'scale(1)' },
+                            '100%': { transform: 'scale(1.03)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        modalMarquee: {
+                            '0%': { transform: 'translateX(100%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                    },
                 },
             }
         }
@@ -31,6 +62,8 @@
             .masonry-grid {
                 column-count: 1;
                 column-gap: 1rem;
+                orphans: 1;
+                widows: 1;
             }
             @screen md {
                 .masonry-grid {
@@ -50,25 +83,41 @@
             .masonry-item {
                 break-inside: avoid;
                 margin-bottom: 1rem;
+                page-break-inside: avoid;
             }
-            .fade-in {
-                animation: fadeIn 0.6s ease-in-out;
+            .image-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform-origin: center center;
+                will-change: transform, box-shadow;
             }
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
+            .image-card:hover {
+                transform: scale(1.03);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
             }
-            .scale-hover {
-                transition: transform 0.3s ease;
+            .image-overlay {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                opacity: 0;
+                transform: translateY(10px);
             }
-            .scale-hover:hover {
-                transform: scale(1.02);
+            .image-card:hover .image-overlay {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .btn-hover {
+                transition: all 0.2s ease-out;
+                transform: translateY(2px);
+            }
+            .image-card:hover .btn-hover {
+                transform: translateY(0);
+            }
+            .category-card {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transform-origin: center center;
+                will-change: transform, box-shadow;
+            }
+            .category-card:hover {
+                transform: translateY(-5px) scale(1.02);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             }
             .skeleton {
                 background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -89,6 +138,7 @@
                 background-position: center;
                 background-repeat: no-repeat;
                 position: relative;
+                animation: float 6s ease-in-out infinite;
             }
             .welcome-overlay {
                 position: absolute;
@@ -118,18 +168,62 @@
                 backdrop-filter: blur(8px);
             }
             .like-animation {
-                animation: likePulse 0.6s ease-in-out;
+                animation: likePulse 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             }
             @keyframes likePulse {
                 0% {
                     transform: scale(1);
                 }
                 50% {
-                    transform: scale(1.3);
+                    transform: scale(1.4);
                 }
                 100% {
                     transform: scale(1);
                 }
+            }
+            .image-loaded {
+                animation: fadeInUp 0.5s ease-out;
+            }
+            .nav-btn {
+                transition: all 0.2s ease;
+                opacity: 0.8;
+            }
+            .nav-btn:hover {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            .modal-enter {
+                animation: modalEnter 0.3s ease-out;
+            }
+            .modal-exit {
+                animation: modalExit 0.3s ease-in;
+            }
+            @keyframes modalEnter {
+                0% {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                100% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+            @keyframes modalExit {
+                0% {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+            }
+            .modal-marquee-container {
+                overflow: hidden;
+                position: relative;
+                white-space: nowrap;
+                display: inline-block;
+                width: 100%;
             }
         }
     </style>
@@ -143,11 +237,11 @@
             <div class="welcome-overlay"></div>
             
             <!-- 主要内容 -->
-            <div class="text-center text-white z-10 px-4">
-                <h1 class="text-4xl md:text-6xl font-bold mb-8 fade-in">
-                    <i class="fa fa-cutlery mr-4"></i>王府必吃图鉴
+            <div class="text-center text-white z-10 px-4 animate-fade-in-up">
+                <h1 class="text-4xl md:text-6xl font-bold mb-8">
+                    <i class="fa fa-cutlery mr-4 animate-bounce-slow"></i>王府必吃图鉴
                 </h1>
-                <button id="enterBtn" class="bg-white text-primary px-10 py-5 rounded-full text-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl fade-in" style="animation-delay: 0.3s;">
+                <button id="enterBtn" class="bg-white text-primary px-10 py-5 rounded-full text-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-xl animate-slide-up" style="animation-delay: 0.3s;">
                     <i class="fa fa-arrow-right mr-2"></i>进入王府必吃图鉴
                 </button>
             </div>
@@ -155,9 +249,9 @@
 
         <!-- 年龄验证页 -->
         <div id="ageVerifyPage" class="min-h-screen bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center hidden">
-            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl animate-fade-in-up">
                 <div class="text-center mb-8">
-                    <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse-slow">
                         <i class="fa fa-exclamation-triangle text-white text-2xl"></i>
                     </div>
                     <h2 class="text-2xl font-bold text-gray-800 mb-2">年龄验证</h2>
@@ -167,7 +261,7 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">请选择您的年龄</label>
-                        <select id="ageSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <select id="ageSelect" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
                             <option value="">请选择...</option>
                             <option value="under">18岁以下</option>
                             <option value="over">18岁及以上</option>
@@ -185,11 +279,11 @@
                     </div>
 
                     <div class="flex items-center">
-                        <input type="checkbox" id="agreeTerms" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded">
+                        <input type="checkbox" id="agreeTerms" class="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded transition-all duration-200">
                         <label for="agreeTerms" class="ml-2 text-sm text-gray-600">我已阅读并同意免责声明</label>
                     </div>
 
-                    <button id="verifyBtn" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                    <button id="verifyBtn" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">
                         确认进入
                     </button>
                 </div>
@@ -202,7 +296,7 @@
             <div class="category-overlay"></div>
             
             <!-- 顶部导航 -->
-            <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+            <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
                         <div class="flex items-center">
@@ -210,10 +304,10 @@
                             <h1 class="text-xl font-bold text-gray-900">王府必吃图鉴</h1>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <button id="submitBtn" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-yellow-500 transition-colors duration-300">
+                            <button id="submitBtn" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-yellow-500 transition-all duration-300 transform hover:scale-105 shadow-lg">
                                 <i class="fa fa-upload mr-2"></i>图片投稿
                             </button>
-                            <button id="logoutBtn" class="text-gray-500 hover:text-red-600 transition-colors duration-300">
+                            <button id="logoutBtn" class="text-gray-500 hover:text-red-600 transition-all duration-300 transform hover:scale-105">
                                 <i class="fa fa-sign-out mr-1"></i>退出
                             </button>
                         </div>
@@ -223,17 +317,17 @@
 
             <!-- 主要内容 -->
             <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
-                <div class="text-center mb-12">
+                <div class="text-center mb-12 animate-fade-in-up">
                     <h2 class="text-3xl font-bold text-gray-900 mb-4">选择图片分类</h2>
                     <p class="text-gray-600">点击下方分类查看更多图片</p>
                 </div>
 
                 <!-- 分类网格 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div id="categoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- 啵啵分类 -->
-                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer scale-hover" data-category="bobo">
+                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer" data-category="bobo">
                         <div class="relative">
-                            <img src="https://aka.doubaocdn.com/s/IHlz1vOv4T?alice_filename=" alt="啵啵" class="w-full h-48 object-cover">
+                            <img src="https://aka.doubaocdn.com/s/IHlz1vOv4T?alice_filename=" alt="啵啵" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" onload="this.classList.add('image-loaded')" onerror="this.src='https://via.placeholder.com/400x300?text=图片加载失败'">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div class="absolute bottom-4 left-4 text-white">
                                 <h3 class="text-xl font-bold">啵啵</h3>
@@ -241,16 +335,16 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-600 transition-colors duration-300">
+                            <button class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105">
                                 查看图片
                             </button>
                         </div>
                     </div>
 
                     <!-- 发发分类 -->
-                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer scale-hover" data-category="fafa">
+                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer" data-category="fafa">
                         <div class="relative">
-                            <img src="https://aka.doubaocdn.com/s/EHym1vOv4T?alice_filename=" alt="发发" class="w-full h-48 object-cover">
+                            <img src="https://aka.doubaocdn.com/s/EHym1vOv4T?alice_filename=" alt="发发" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" onload="this.classList.add('image-loaded')" onerror="this.src='https://via.placeholder.com/400x300?text=图片加载失败'">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                             <div class="absolute bottom-4 left-4 text-white">
                                 <h3 class="text-xl font-bold">发发</h3>
@@ -258,16 +352,16 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <button class="w-full bg-secondary text-white py-2 rounded-lg hover:bg-green-600 transition-colors duration-300">
+                            <button class="w-full bg-secondary text-white py-2 rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105">
                                 查看图片
                             </button>
                         </div>
                     </div>
 
                     <!-- 其他分类 -->
-                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer scale-hover" data-category="other">
+                    <div class="category-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer" data-category="other">
                         <div class="relative">
-                            <img id="otherCategoryImage" src="" alt="其他" class="w-full h-48 object-cover hidden">
+                            <img id="otherCategoryImage" src="" alt="其他" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110 hidden" onload="this.classList.add('image-loaded'); this.classList.remove('hidden'); document.getElementById('otherCategoryPlaceholder').classList.add('hidden')" onerror="this.classList.add('hidden'); document.getElementById('otherCategoryPlaceholder').classList.remove('hidden')">
                             <div id="otherCategoryPlaceholder" class="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
                                 <i class="fa fa-folder-open text-gray-400 text-4xl"></i>
                             </div>
@@ -278,11 +372,13 @@
                             </div>
                         </div>
                         <div class="p-4">
-                            <button class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-colors duration-300">
+                            <button class="w-full bg-gray-500 text-white py-2 rounded-lg hover:bg-gray-600 transition-all duration-300 transform hover:scale-105">
                                 查看图片
                             </button>
                         </div>
                     </div>
+
+                    <!-- 赞过的图片分类 - 将通过JavaScript动态添加 -->
                 </div>
             </main>
         </div>
@@ -290,10 +386,10 @@
         <!-- 图片画廊页 -->
         <div id="galleryPage" class="min-h-screen bg-gray-50 hidden">
             <!-- 顶部导航 -->
-            <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+            <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 backdrop-blur-sm bg-white/95">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center h-16">
-                        <button id="backToCategories" class="text-gray-600 hover:text-primary transition-colors duration-300">
+                        <button id="backToCategories" class="text-gray-600 hover:text-primary transition-all duration-300 transform hover:scale-105 nav-btn">
                             <i class="fa fa-arrow-left mr-2"></i>返回分类
                         </button>
                         <h1 id="galleryTitle" class="text-xl font-bold text-gray-900">王府必吃图鉴</h1>
@@ -305,26 +401,25 @@
             <!-- 主要内容 -->
             <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <!-- 分类信息 -->
-                <div class="mb-8 text-center">
+                <div class="mb-8 text-center animate-fade-in-up">
                     <h2 id="categoryTitle" class="text-2xl font-bold text-gray-900 mb-2">图片分类</h2>
                     <p id="categoryDescription" class="text-gray-600">正在加载图片...</p>
                 </div>
 
                 <!-- 图片筛选和排序 -->
-                <div class="bg-white rounded-lg shadow-sm p-4 mb-8">
+                <div class="bg-white rounded-lg shadow-sm p-4 mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="flex items-center space-x-4">
                             <span class="text-sm font-medium text-gray-700">排序方式:</span>
-                            <select id="sortSelect" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <select id="sortSelect" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
                                 <option value="newest">最新上传</option>
                                 <option value="oldest">最早上传</option>
                                 <option value="random">随机排序</option>
-                                <option value="mostLiked">最多点赞</option>
                             </select>
                         </div>
                         <div class="flex items-center space-x-4">
                             <span class="text-sm font-medium text-gray-700">显示数量:</span>
-                            <select id="limitSelect" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <select id="limitSelect" class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200">
                                 <option value="12">12张/页</option>
                                 <option value="24" selected>24张/页</option>
                                 <option value="48">48张/页</option>
@@ -339,7 +434,7 @@
                 </div>
 
                 <!-- 加载指示器 -->
-                <div id="loadingIndicator" class="text-center py-8 hidden">
+                <div id="loadingIndicator" class="text-center py-8 hidden animate-pulse">
                     <div class="inline-flex items-center space-x-2 text-gray-600">
                         <div class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
                         <span>正在加载更多图片...</span>
@@ -347,44 +442,44 @@
                 </div>
 
                 <!-- 没有更多图片 -->
-                <div id="noMoreImages" class="text-center py-8 hidden">
+                <div id="noMoreImages" class="text-center py-8 hidden animate-fade-in-up">
                     <div class="text-gray-500">
-                        <i class="fa fa-check-circle text-2xl mb-2"></i>
+                        <i class="fa fa-check-circle text-2xl mb-2 text-green-500"></i>
                         <p>已经加载完所有图片</p>
                     </div>
                 </div>
 
                 <!-- 空状态 -->
-                <div id="emptyState" class="text-center py-16 hidden">
+                <div id="emptyState" class="text-center py-16 hidden animate-fade-in-up">
                     <div class="max-w-md mx-auto">
                         <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fa fa-picture-o text-gray-400 text-3xl"></i>
+                            <i class="fa fa-heart-o text-gray-400 text-3xl"></i>
                         </div>
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">暂无图片</h3>
-                        <p class="text-gray-600">该分类下暂无图片，敬请期待</p>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">暂无点赞图片</h3>
+                        <p class="text-gray-600">您还没有点赞任何图片，快去点赞喜欢的图片吧！</p>
                     </div>
                 </div>
             </main>
         </div>
 
         <!-- 图片查看器模态框 -->
-        <div id="imageViewer" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
-            <div class="relative max-w-6xl max-h-full">
+        <div id="imageViewer" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="relative max-w-6xl max-h-full animate-modal-enter">
                 <!-- 关闭按钮 -->
-                <button id="closeViewer" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10 transition-colors duration-300">
+                <button id="closeViewer" class="absolute top-4 right-4 text-white text-2xl hover:text-gray-300 z-10 transition-all duration-300 transform hover:scale-110 nav-btn">
                     <i class="fa fa-times"></i>
                 </button>
 
                 <!-- 导航按钮 -->
-                <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 z-10 transition-colors duration-300">
+                <button id="prevImage" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 z-10 transition-all duration-300 nav-btn">
                     <i class="fa fa-chevron-left"></i>
                 </button>
-                <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 z-10 transition-colors duration-300">
+                <button id="nextImage" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 z-10 transition-all duration-300 nav-btn">
                     <i class="fa fa-chevron-right"></i>
                 </button>
 
                 <!-- 图片信息 -->
-                <div class="absolute bottom-4 left-4 right-4 text-white bg-black bg-opacity-50 rounded-lg p-4 z-10">
+                <div class="absolute bottom-4 left-4 right-4 text-white bg-black bg-opacity-70 rounded-lg p-4 z-10 animate-slide-up">
                     <div class="flex justify-between items-center">
                         <div>
                             <h3 id="viewerImageTitle" class="text-lg font-semibold mb-1">图片标题</h3>
@@ -392,8 +487,8 @@
                         </div>
                         <div class="flex items-center space-x-4">
                             <!-- 点赞按钮 -->
-                            <button id="likeBtn" class="flex items-center space-x-1 text-white hover:text-like transition-all duration-300">
-                                <i class="fa fa-heart text-lg"></i>
+                            <button id="likeBtn" class="flex items-center space-x-1 text-white hover:text-like transition-all duration-300 transform hover:scale-110">
+                                <i class="fa fa-heart-o text-lg"></i>
                                 <span id="likeCount" class="text-sm">0</span>
                             </button>
                         </div>
@@ -402,7 +497,7 @@
 
                 <!-- 图片容器 -->
                 <div class="relative">
-                    <img id="viewerImage" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg">
+                    <img id="viewerImage" src="" alt="" class="max-w-full max-h-full object-contain rounded-lg transition-all duration-300" onload="this.style.opacity='1'" onerror="this.src='https://via.placeholder.com/800x600?text=图片加载失败'">
                 </div>
             </div>
         </div>
@@ -411,16 +506,26 @@
         <div id="submitModal" class="fixed inset-0 bg-black bg-opacity-50 modal-backdrop z-50 hidden flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
                 <div class="text-center">
-                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse-slow">
                         <i class="fa fa-upload text-white text-2xl"></i>
                     </div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-4">图片投稿</h3>
-                    <div class="bg-gray-100 rounded-lg p-6 mb-6">
+                    
+                    <!-- 弹窗内滚动字幕 -->
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-500 text-white py-2 rounded-lg mb-6 animate-fade-in-up" style="animation-delay: 0.1s;">
+                        <div class="modal-marquee-container">
+                            <div class="animate-modal-marquee text-sm font-medium">
+                                如有刷机需求同样可咨询钉钉
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-100 rounded-lg p-6 mb-6 animate-fade-in-up" style="animation-delay: 0.2s;">
                         <p class="text-2xl font-bold text-center text-accent">钉钉搜</p>
                         <p class="text-3xl font-bold text-center text-primary mt-2">liwangyu2023</p>
                     </div>
-                    <p class="text-gray-600 mb-6">扫描或搜索上方钉钉号进行投稿</p>
-                    <button id="closeModal" class="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors duration-300">
+                    <p class="text-gray-600 mb-6 animate-fade-in-up" style="animation-delay: 0.3s;">搜索上方钉钉号进行投稿</p>
+                    <button id="closeModal" class="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-all duration-300 transform hover:scale-105 animate-fade-in-up" style="animation-delay: 0.4s;">
                         关闭
                     </button>
                 </div>
@@ -464,8 +569,8 @@
         let currentImageIndex = 0;
 
         // 点赞数据
-        let likeData = {};
-        let userLikes = new Set();
+        let globalLikeCount = 0;
+        let userLikedImages = []; // 存储用户点赞过的图片URL
 
         // DOM元素
         const elements = {
@@ -480,6 +585,7 @@
             logoutBtn: document.getElementById('logoutBtn'),
             submitBtn: document.getElementById('submitBtn'),
             categoryCards: document.querySelectorAll('.category-card'),
+            categoryGrid: document.getElementById('categoryGrid'),
             backToCategories: document.getElementById('backToCategories'),
             galleryTitle: document.getElementById('galleryTitle'),
             categoryTitle: document.getElementById('categoryTitle'),
@@ -512,6 +618,8 @@
             checkAgeVerification();
             setupOtherCategoryCover();
             loadLikeData();
+            updateLikedCategory();
+            console.log('初始化完成，当前点赞图片数:', userLikedImages.length);
         }
 
         // 设置"其他"分类封面
@@ -523,8 +631,6 @@
                 
                 // 创建图片元素并设置加载处理
                 const img = new Image();
-                img.src = randomImage;
-                
                 img.onload = function() {
                     // 图片加载成功，显示图片
                     elements.otherCategoryImage.src = randomImage;
@@ -538,53 +644,64 @@
                     elements.otherCategoryImage.classList.add('hidden');
                     elements.otherCategoryPlaceholder.classList.remove('hidden');
                 };
+                
+                img.src = randomImage;
             }
         }
 
         // 加载点赞数据
         function loadLikeData() {
-            const savedLikes = localStorage.getItem('likeData');
-            const savedUserLikes = localStorage.getItem('userLikes');
-            
-            if (savedLikes) {
-                likeData = JSON.parse(savedLikes);
-            }
-            
-            if (savedUserLikes) {
-                userLikes = new Set(JSON.parse(savedUserLikes));
+            try {
+                const savedData = localStorage.getItem('globalLikeData');
+                if (savedData) {
+                    const data = JSON.parse(savedData);
+                    globalLikeCount = data.totalLikes || 0;
+                    userLikedImages = data.userLikes || [];
+                    console.log('加载点赞数据成功:', data);
+                }
+            } catch (error) {
+                console.error('加载点赞数据失败:', error);
+                globalLikeCount = 0;
+                userLikedImages = [];
             }
         }
 
         // 保存点赞数据
         function saveLikeData() {
-            localStorage.setItem('likeData', JSON.stringify(likeData));
-            localStorage.setItem('userLikes', JSON.stringify([...userLikes]));
+            try {
+                const data = {
+                    totalLikes: globalLikeCount,
+                    userLikes: userLikedImages
+                };
+                localStorage.setItem('globalLikeData', JSON.stringify(data));
+                console.log('保存点赞数据成功:', data);
+            } catch (error) {
+                console.error('保存点赞数据失败:', error);
+            }
         }
 
-        // 获取图片的点赞数量
-        function getLikeCount(imageSrc) {
-            return likeData[imageSrc] || 0;
-        }
-
-        // 检查用户是否已点赞
+        // 检查用户是否已点赞该图片
         function hasUserLiked(imageSrc) {
-            return userLikes.has(imageSrc);
+            return userLikedImages.includes(imageSrc);
         }
 
         // 点赞/取消点赞
         function toggleLike(imageSrc) {
             if (hasUserLiked(imageSrc)) {
                 // 取消点赞
-                likeData[imageSrc] = Math.max(0, (likeData[imageSrc] || 0) - 1);
-                userLikes.delete(imageSrc);
+                globalLikeCount = Math.max(0, globalLikeCount - 1);
+                userLikedImages = userLikedImages.filter(src => src !== imageSrc);
+                console.log('取消点赞:', imageSrc, '当前总点赞数:', globalLikeCount);
             } else {
                 // 点赞
-                likeData[imageSrc] = (likeData[imageSrc] || 0) + 1;
-                userLikes.add(imageSrc);
+                globalLikeCount += 1;
+                userLikedImages.push(imageSrc);
+                console.log('点赞:', imageSrc, '当前总点赞数:', globalLikeCount);
             }
             
             saveLikeData();
-            updateLikeDisplay(imageSrc);
+            updateAllLikeDisplays();
+            updateLikedCategory();
             
             // 添加点赞动画
             elements.likeBtn.classList.add('like-animation');
@@ -593,12 +710,23 @@
             }, 600);
         }
 
-        // 更新点赞显示
+        // 更新所有点赞显示
+        function updateAllLikeDisplays() {
+            // 更新图片查看器中的点赞显示
+            if (currentImages.length > 0 && currentImageIndex < currentImages.length) {
+                const currentImageSrc = currentImages[currentImageIndex];
+                updateLikeDisplay(currentImageSrc);
+            }
+            
+            // 更新网格中所有图片的点赞显示
+            updateGridLikeDisplays();
+        }
+
+        // 更新图片查看器中的点赞显示
         function updateLikeDisplay(imageSrc) {
-            const count = getLikeCount(imageSrc);
             const liked = hasUserLiked(imageSrc);
             
-            elements.likeCount.textContent = count;
+            elements.likeCount.textContent = globalLikeCount;
             
             if (liked) {
                 elements.likeBtn.classList.add('text-like');
@@ -609,6 +737,100 @@
                 elements.likeBtn.querySelector('i').classList.add('fa-heart-o');
                 elements.likeBtn.querySelector('i').classList.remove('fa-heart');
             }
+        }
+
+        // 更新网格中所有图片的点赞显示
+        function updateGridLikeDisplays() {
+            const likeElements = document.querySelectorAll('.masonry-item .fa-heart, .masonry-item .fa-heart-o');
+            likeElements.forEach((element, index) => {
+                if (index < currentImages.length) {
+                    const imageSrc = currentImages[index];
+                    const liked = hasUserLiked(imageSrc);
+                    const countElement = element.nextElementSibling;
+                    
+                    if (countElement) {
+                        countElement.textContent = globalLikeCount;
+                    }
+                    
+                    if (liked) {
+                        element.classList.add('fa-heart', 'text-like');
+                        element.classList.remove('fa-heart-o', 'text-white');
+                    } else {
+                        element.classList.add('fa-heart-o', 'text-white');
+                        element.classList.remove('fa-heart', 'text-like');
+                    }
+                }
+            });
+        }
+
+        // 更新"赞过的图片"分类
+        function updateLikedCategory() {
+            // 先移除已存在的"赞过的图片"分类
+            const existingLikedCategory = document.querySelector('[data-category="liked"]');
+            if (existingLikedCategory) {
+                existingLikedCategory.style.opacity = '0';
+                existingLikedCategory.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    existingLikedCategory.remove();
+                }, 300);
+            }
+            
+            // 如果用户点赞过图片，添加"赞过的图片"分类
+            if (userLikedImages.length > 0) {
+                setTimeout(() => {
+                    const likedCategory = createLikedCategoryCard();
+                    elements.categoryGrid.appendChild(likedCategory);
+                    
+                    // 为新添加的分类绑定点击事件
+                    likedCategory.addEventListener('click', () => {
+                        showGallery('liked');
+                    });
+                    
+                    // 添加进入动画
+                    setTimeout(() => {
+                        likedCategory.style.opacity = '1';
+                        likedCategory.style.transform = 'scale(1)';
+                    }, 50);
+                }, 300);
+            }
+        }
+
+        // 创建"赞过的图片"分类卡片
+        function createLikedCategoryCard() {
+            const card = document.createElement('div');
+            card.className = 'category-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer';
+            card.dataset.category = 'liked';
+            card.style.opacity = '0';
+            card.style.transform = 'scale(0.95)';
+            card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            // 使用第一张点赞图片作为封面，如果没有则使用默认图标
+            const coverImage = userLikedImages.length > 0 ? userLikedImages[0] : '';
+            
+            card.innerHTML = `
+                <div class="relative">
+                    ${coverImage ? `
+                        <img src="${coverImage}" alt="赞过的图片" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-110" onload="this.classList.add('image-loaded')" onerror="this.src='https://via.placeholder.com/400x300?text=图片加载失败'">
+                    ` : `
+                        <div class="w-full h-48 bg-gradient-to-br from-like/20 to-like/10 flex items-center justify-center">
+                            <i class="fa fa-heart text-like text-4xl"></i>
+                        </div>
+                    `}
+
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 text-white">
+                        <h3 class="text-xl font-bold">赞过的图片</h3>
+                        <p class="text-sm opacity-90">${userLikedImages.length}张图片</p>
+                    </div>
+                </div>
+                <div class="p-4">
+                    <button class="w-full bg-like text-white py-2 rounded-lg hover:bg-red-600 transition-all duration-300 transform hover:scale-105">
+                        查看图片
+                    </button>
+                </div>
+            `;
+            
+            return card;
         }
 
         // 绑定事件
@@ -638,6 +860,8 @@
                 showPage('categoryPage');
                 // 返回分类页时重新设置"其他"分类封面
                 setTimeout(setupOtherCategoryCover, 100);
+                // 更新"赞过的图片"分类
+                setTimeout(updateLikedCategory, 100);
             });
             elements.sortSelect.addEventListener('change', () => {
                 resetGallery();
@@ -659,8 +883,10 @@
                 }
             });
             elements.likeBtn.addEventListener('click', () => {
-                const currentImageSrc = currentImages[currentImageIndex];
-                toggleLike(currentImageSrc);
+                if (currentImages.length > 0 && currentImageIndex < currentImages.length) {
+                    const currentImageSrc = currentImages[currentImageIndex];
+                    toggleLike(currentImageSrc);
+                }
             });
 
             // 投稿弹窗事件
@@ -671,11 +897,24 @@
                 }
             });
 
-            // 滚动加载事件
-            window.addEventListener('scroll', handleScroll);
+            // 滚动加载事件 - 使用防抖优化
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(handleScroll, 100);
+            });
 
             // 键盘事件
             document.addEventListener('keydown', handleKeyPress);
+
+            // 添加图片加载错误处理的全局事件
+            window.addEventListener('error', (e) => {
+                if (e.target.tagName === 'IMG') {
+                    console.log('图片加载失败:', e.target.src);
+                    e.target.src = 'https://via.placeholder.com/400x300?text=图片加载失败';
+                    e.target.onerror = null; // 防止无限循环
+                }
+            }, true);
         }
 
         // 页面切换
@@ -684,7 +923,17 @@
             pages.forEach(page => {
                 elements[page].classList.add('hidden');
             });
+            
+            // 添加页面切换动画
             elements[pageId].classList.remove('hidden');
+            elements[pageId].style.opacity = '0';
+            elements[pageId].style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                elements[pageId].style.transition = 'all 0.5s ease-out';
+                elements[pageId].style.opacity = '1';
+                elements[pageId].style.transform = 'translateY(0)';
+            }, 10);
         }
 
         // 更新验证按钮状态
@@ -701,6 +950,8 @@
                 showPage('categoryPage');
                 // 显示分类页时设置"其他"分类封面
                 setTimeout(setupOtherCategoryCover, 100);
+                // 更新"赞过的图片"分类
+                setTimeout(updateLikedCategory, 100);
             }
         }
 
@@ -711,6 +962,8 @@
                 showPage('categoryPage');
                 // 显示分类页时设置"其他"分类封面
                 setTimeout(setupOtherCategoryCover, 100);
+                // 更新"赞过的图片"分类
+                setTimeout(updateLikedCategory, 100);
             } else {
                 showPage('welcomePage');
             }
@@ -725,7 +978,13 @@
         // 显示画廊
         function showGallery(category) {
             currentCategory = category;
-            currentImages = [...imageData[category]];
+            
+            // 根据分类获取图片数据
+            if (category === 'liked') {
+                currentImages = [...userLikedImages];
+            } else {
+                currentImages = [...(imageData[category] || [])];
+            }
             
             // 根据排序方式排序图片
             sortImages();
@@ -751,13 +1010,19 @@
             const categoryNames = {
                 bobo: '啵啵',
                 fafa: '发发',
-                other: '其他'
+                other: '其他',
+                liked: '赞过的图片'
             };
             
-            const categoryName = categoryNames[currentCategory];
+            const categoryName = categoryNames[currentCategory] || '图片分类';
             elements.galleryTitle.textContent = `${categoryName} 画廊`;
             elements.categoryTitle.textContent = categoryName;
-            elements.categoryDescription.textContent = `共 ${currentImages.length} 张图片`;
+            
+            if (currentCategory === 'liked') {
+                elements.categoryDescription.textContent = `您赞过的图片，共 ${currentImages.length} 张`;
+            } else {
+                elements.categoryDescription.textContent = `共 ${currentImages.length} 张图片，总点赞数: ${globalLikeCount}`;
+            }
         }
 
         // 排序图片
@@ -774,14 +1039,6 @@
                 case 'random':
                     // 随机排序
                     currentImages = shuffleArray(currentImages);
-                    break;
-                case 'mostLiked':
-                    // 按点赞数排序
-                    currentImages.sort((a, b) => {
-                        const likesA = getLikeCount(a);
-                        const likesB = getLikeCount(b);
-                        return likesB - likesA;
-                    });
                     break;
             }
         }
@@ -813,11 +1070,12 @@
                 if (imagesToLoad.length === 0) {
                     hasMoreImages = false;
                     elements.loadingIndicator.classList.add('hidden');
-                    elements.noMoreImages.classList.remove('hidden');
                     
                     // 检查是否为空
                     if (currentImages.length === 0) {
                         elements.emptyState.classList.remove('hidden');
+                    } else {
+                        elements.noMoreImages.classList.remove('hidden');
                     }
                 } else {
                     renderImages(imagesToLoad);
@@ -828,36 +1086,38 @@
                 elements.loadingIndicator.classList.add('hidden');
                 
                 // 如果没有更多图片，显示提示
-                if (!hasMoreImages) {
+                if (!hasMoreImages && currentImages.length > 0) {
                     elements.noMoreImages.classList.remove('hidden');
                 }
-            }, 800);
+            }, 600); // 减少加载时间，提升用户体验
         }
 
         // 渲染图片
         function renderImages(images) {
             images.forEach((src, index) => {
                 const imageItem = document.createElement('div');
-                imageItem.className = 'masonry-item fade-in scale-hover cursor-pointer';
-                imageItem.style.animationDelay = `${index * 0.1}s`;
-                
-                const likeCount = getLikeCount(src);
+                imageItem.className = 'masonry-item cursor-pointer';
+                imageItem.style.animationDelay = `${index * 0.05}s`;
+
                 const liked = hasUserLiked(src);
                 
                 imageItem.innerHTML = `
-                    <div class="relative group">
+                    <div class="relative group image-card rounded-lg overflow-hidden">
                         <img src="${src}" alt="图片 ${index + 1}" 
-                             class="w-full rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 object-cover"
-                             loading="lazy">
-                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100">
-                            <button class="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-300 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                             class="w-full rounded-lg shadow-sm object-cover transition-transform duration-500 group-hover:scale-105"
+                             loading="lazy"
+                             onload="this.classList.add('image-loaded'); this.style.opacity='1'"
+                             onerror="this.src='https://via.placeholder.com/400x300?text=图片加载失败'; this.onerror=null"
+                             style="opacity: 0; transition: opacity 0.3s ease-out;">
+                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 rounded-lg flex items-center justify-center image-overlay">
+                            <button class="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 btn-hover">
                                 <i class="fa fa-expand mr-2"></i>查看大图
                             </button>
                         </div>
                         <!-- 图片底部信息 -->
-                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-60 rounded-full px-3 py-1 flex items-center space-x-1">
+                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-70 rounded-full px-3 py-1 flex items-center space-x-1 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300">
                             <i class="fa ${liked ? 'fa-heart text-like' : 'fa-heart-o text-white'} text-sm"></i>
-                            <span class="text-white text-xs">${likeCount}</span>
+                            <span class="text-white text-xs">${globalLikeCount}</span>
                         </div>
                     </div>
                 `;
@@ -871,19 +1131,29 @@
                 });
                 
                 elements.imageGrid.appendChild(imageItem);
+                
+                // 添加进入动画
+                setTimeout(() => {
+                    imageItem.classList.add('animate-fade-in-up');
+                }, 10);
             });
         }
 
-        // 处理滚动加载
+        // 处理滚动加载 - 使用节流优化
+        let lastScrollTime = 0;
         function handleScroll() {
+            const currentTime = Date.now();
+            if (currentTime - lastScrollTime < 100) return; // 100ms节流
+            lastScrollTime = currentTime;
+            
             if (isLoading || !hasMoreImages || currentImages.length === 0) return;
             
             const scrollTop = window.pageYOffset;
             const windowHeight = window.innerHeight;
             const documentHeight = document.documentElement.scrollHeight;
             
-            // 当滚动到页面底部200px时加载更多
-            if (scrollTop + windowHeight >= documentHeight - 200) {
+            // 当滚动到页面底部300px时加载更多
+            if (scrollTop + windowHeight >= documentHeight - 300) {
                 loadImages();
             }
         }
@@ -893,7 +1163,10 @@
             currentImageIndex = index;
             const imageSrc = currentImages[index];
             
+            // 重置图片透明度
+            elements.viewerImage.style.opacity = '0';
             elements.viewerImage.src = imageSrc;
+            
             elements.viewerImageTitle.textContent = `图片 ${index + 1}`;
             elements.viewerImageInfo.textContent = `${index + 1}/${currentImages.length}`;
             
@@ -904,13 +1177,29 @@
             
             // 禁止背景滚动
             document.body.style.overflow = 'hidden';
+            
+            // 添加模态框进入动画
+            const modalContent = elements.imageViewer.querySelector('.animate-modal-enter');
+            if (modalContent) {
+                modalContent.style.animation = 'none';
+                setTimeout(() => {
+                    modalContent.style.animation = 'modalEnter 0.3s ease-out';
+                }, 10);
+            }
         }
 
         // 关闭图片查看器
         function closeImageViewer() {
-            elements.imageViewer.classList.add('hidden');
-            // 恢复背景滚动
-            document.body.style.overflow = 'auto';
+            const modalContent = elements.imageViewer.querySelector('.animate-modal-enter');
+            if (modalContent) {
+                modalContent.style.animation = 'modalExit 0.3s ease-in';
+            }
+            
+            setTimeout(() => {
+                elements.imageViewer.classList.add('hidden');
+                // 恢复背景滚动
+                document.body.style.overflow = 'auto';
+            }, 300);
         }
 
         // 显示上一张图片
@@ -969,8 +1258,10 @@
                         break;
                     case ' ':
                         e.preventDefault();
-                        const currentImageSrc = currentImages[currentImageIndex];
-                        toggleLike(currentImageSrc);
+                        if (currentImages.length > 0 && currentImageIndex < currentImages.length) {
+                            const currentImageSrc = currentImages[currentImageIndex];
+                            toggleLike(currentImageSrc);
+                        }
                         break;
                 }
             } else if (!elements.submitModal.classList.contains('hidden')) {
