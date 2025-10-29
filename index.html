@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王府小吃街</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#E5E5E5',
+                        secondary: '#333333',
+                        accent: '#D4AF37'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 1s ease-in-out',
+                        'slide-up': 'slideUp 0.8s ease-out',
+                        'slide-down': 'slideDown 0.8s ease-out',
+                        'door-open': 'doorOpen 2s ease-in-out forwards',
+                        'gallery-move': 'galleryMove 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(50px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-50px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        doorOpen: {
+                            '0%': { transform: 'scaleX(1)', transformOrigin: 'center' },
+                            '50%': { transform: 'scaleX(0.1)', transformOrigin: 'center' },
+                            '100%': { transform: 'scaleX(1)', transformOrigin: 'center' },
+                        },
+                        galleryMove: {
+                            '0%': { transform: 'translateX(0)' },
+                            '100%': { transform: 'translateX(var(--translate-value))' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .text-shadow-lg {
+                text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            .perspective {
+                perspective: 1000px;
+            }
+            .preserve-3d {
+                transform-style: preserve-3d;
+            }
+            .backface-hidden {
+                backface-visibility: hidden;
+            }
+            .rotate-y-180 {
+                transform: rotateY(180deg);
+            }
+            .gallery-container {
+                width: 100%;
+                overflow: hidden;
+                position: relative;
+            }
+            .gallery-scroll {
+                display: flex;
+                transition: transform 0.5s ease-out;
+            }
+            .gallery-section {
+                min-width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 2rem;
+            }
+            .artwork {
+                max-width: 80%;
+                max-height: 80vh;
+                object-fit: contain;
+                border-radius: 4px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                background-color: rgba(255, 255, 255, 0.8);
+                padding: 20px;
+            }
+            .artwork:hover {
+                transform: scale(1.02);
+            }
+            .nav-indicator {
+                position: absolute;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 10px;
+                z-index: 10;
+            }
+            .nav-dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.5);
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+            .nav-dot.active {
+                background-color: white;
+                transform: scale(1.2);
+            }
+            .scroll-arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 50px;
+                height: 50px;
+                background-color: rgba(255, 255, 255, 0.7);
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                z-index: 10;
+                transition: all 0.3s ease;
+            }
+            .scroll-arrow:hover {
+                background-color: white;
+                transform: translateY(-50%) scale(1.1);
+            }
+            .scroll-arrow.prev {
+                left: 20px;
+            }
+            .scroll-arrow.next {
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans overflow-x-hidden">
+    <!-- 入口页面 -->
+    <section id="entry-page" class="relative h-screen w-full bg-black flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/3f12a244ac024d66a61eba7a74201b93.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251029094006480F04F36303B3481518&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306806&x-signature=f4syaZDbGS%2FDZ56dCLJzKS2r0ZM%3D" 
+                 alt="王府小吃街" 
+                 class="w-full h-full object-cover opacity-80">
+            <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+        </div>
+        
+        <div class="relative z-10 text-center animate-fade-in">
+            <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 text-shadow-lg animate-slide-down">欢迎来到王府小吃街</h1>
+            
+            <button id="enter-btn" class="px-8 py-3 bg-white bg-accent bg-opacity-90 hover:bg-opacity-100 text-lg font-medium rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50">
+                进入小吃街
+                <i class="fa fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+        
+        <div class="absolute absolute bottom-10 left-0 right-0 text-center text-white text-shadow">
+            <p>点击按钮或按空格键进入</p>
+        </div>
+    </section>
+
+    <!-- 走廊浏览页面 -->
+    <section id="gallery-page" class="relative h-screen w-full bg-gray-100 hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/b35b463ca785405aaeaa7c8f8c1ecc55.jpeg~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029095122CFA0FA8F118EBE218FAC&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762307483&x-signature=W%2B%2F%2B%2F0M1EvlCOvNy1%2FDOVfxvmH4%3D" 
+                 alt="小吃街内部" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-black bg-opacity-20"></div>
+        </div>
+        
+        <div class="gallery-container h-full flex items-center">
+            <div class="gallery-scroll w-full">
+                <!-- 走廊部分 1 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/322b9eb7391d4fe1a1c52a90c4d46a19.jpeg~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=ba0TGEPidW5zpS8R%2BctJrenzaS8%3D" 
+                             alt="参考图1" 
+                             class="artwork"
+                             data-artwork-id="1">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 2 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/5d485547b81c46acabbd2e8737308569.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=TTNCTI%2FI%2Bk87Ot7Q6WUX%2FJVMcIk%3D" 
+                             alt="参考图2" 
+                             class="artwork"
+                             data-artwork-id="2">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 3 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/0e7b445315a9424b920c2202d215e5d6.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=DJmoR2O6Lm6Y1cMIJ4x3OLcrCT4%3D" 
+                             alt="白丝的诱惑" 
+                             class="artwork"
+                             data-artwork-id="3">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 4 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/fa50df50041743758567c38b9d6f5aa4.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=%2FDjc3d1Fb22JSyyrnDb1N%2F5NMPs%3D" 
+                             alt="少羽牛逼_副本" 
+                             class="artwork"
+                             data-artwork-id="4">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 5 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/5f4385fda9f8411ba54cfb662ff6b819.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=HjaTxqXENVt3E5ufaFXp7cVTOA4%3D" 
+                             alt="生成特定图片 (1)" 
+                             class="artwork"
+                             data-artwork-id="5">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 6 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/6116e13fca784158b102baddef589672.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=seZV5A5Y5%2FhEHgZ2zhsusVZFwUY%3D" 
+                             alt="wef太带派了" 
+                             class="artwork"
+                             data-artwork-id="6">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 7 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/4826aaa7131c4a69890fc060264a5ff8.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=2FY1zu5mLC9YdEetETozRo3XrdM%3D" 
+                             alt="太带派了" 
+                             class="artwork"
+                             data-artwork-id="7">
+                    </div>
+                </div>
+                
+                <!-- 走廊部分 8 -->
+                <div class="gallery-section">
+                    <div class="artwork-container">
+                        <img src="https://p11-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/50fed8b3b59f48209bdc553ba497ac74.jpeg~tplv-a9rns2rl98-24:720:720.jpeg?rcl=20251029092651376D2E0C305E123BC20A&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306011&x-signature=JiBAoMfcaO77ng7JTQqRfRCDgN8%3D" 
+                             alt="1761573120760" 
+                             class="artwork"
+                             data-artwork-id="8">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 导航箭头 -->
+        <div class="scroll-arrow prev">
+            <i class="fa fa-chevron-left text-2xl"></i>
+        </div>
+        <div class="scroll-arrow next">
+            <i class="fa fa-chevron-right text-2xl"></i>
+        </div>
+        
+        <!-- 导航指示器 -->
+        <div class="nav-indicator">
+            <div class="nav-dot active" data-index="0"></div>
+            <div class="nav-dot" data-index="1"></div>
+            <div class="nav-dot" data-index="2"></div>
+            <div class="nav-dot" data-index="3"></div>
+            <div class="nav-dot" data-index="4"></div>
+            <div class="nav-dot" data-index="5"></div>
+            <div class="nav-dot" data-index="6"></div>
+            <div class="nav-dot" data-index="7"></div>
+        </div>
+        
+        <!-- 返回按钮 -->
+        <button id="back-btn" class="absolute top-4 left-4 px-4 py-2 bg-white bg-white bg-opacity-70 hover:bg-opacity-100 text-secondary rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none">
+            <i class="fa fa-arrow-left mr-2"></i> 返回小吃街入口
+        </button>
+        
+        <!-- 免责声明按钮 -->
+        <button id="disclaimer-btn" class="absolute bottom-4 right-4 px-4 py-2 bg-white bg-white bg-opacity-70 hover:bg-opacity-100 text-secondary rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none text-sm">
+            免责声明
+        </button>
+        
+        <!-- 信息提示 -->
+        <div class="absolute bottom-10 left-0 right-0 text-center text-white text-shadow">
+            <p>滑动或使用箭头键浏览画廊</p>
+        </div>
+    </section>
+
+    <!-- 免责声明模态框 -->
+    <div id="disclaimer-modal" class="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden">
+            <div class="p-4 flex justify-between items-center border-b">
+                <h3 class="text-xl font-bold text-secondary">免责声明</h3>
+                <button id="close-disclaimer" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-gray-600 mb-4">内容用途为学习，内容均为投稿，与网站制作者无关。</p>
+            </div>
+            <div class="p-4 bg-gray-50 flex justify-end">
+                <button id="disclaimer-close-btn" class="px-4 py-2 bg-secondary text-white rounded hover:bg-gray-700 transition-colors">
+                    我知道了
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 年龄验证界面 -->
+    <section id="age-verification" class="relative h-screen w-full bg-black flex items-center justify-center overflow-hidden hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/3f12a244ac024d66a61eba7a74201b93.jpg~tplv-a9rns2rl98-24:720:720.image?rcl=20251029094006480F04F36303B3481518&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762306806&x-signature=f4syaZDbGS%2FDZ56dCLJzKS2r0ZM%3D" 
+                 alt="王府小吃街" 
+                 class="w-full h-full object-cover opacity-50">
+            <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+        </div>
+        
+        <div class="relative z-10 text-center animate-fade-in bg-white bg-opacity-90 rounded-lg p-8 max-w-md mx-4">
+            <h2 class="text-3xl font-bold text-secondary mb-6">年龄验证</h2>
+            <p class="text-xl text-gray-700 mb-8">您是否已满18岁？</p>
+            
+            <div class="flex flex-col gap-4">
+                <button id="age-yes" class="px-8 py-3 bg-green-600 hover:bg-green-700 text-white text-lg font-medium rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none">
+                    已满18岁
+                </button>
+                <button id="age-no" class="px-8 py-3 bg-red-600 hover:bg-red-700 text-white text-lg font-medium rounded-full transition-all duration-300 transform hover:scale-105 focus:outline-none">
+                    未满18岁
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取页面元素
+            const entryPage = document.getElementById('entry-page');
+            const galleryPage = document.getElementById('gallery-page');
+            const enterBtn = document.getElementById('enter-btn');
+            const backBtn = document.getElementById('back-btn');
+            const galleryScroll = document.querySelector('.gallery-scroll');
+            const gallerySections = document.querySelectorAll('.gallery-section');
+            const navDots = document.querySelectorAll('.nav-dot');
+            const prevBtn = document.querySelector('.scroll-arrow.prev');
+            const nextBtn = document.querySelector('.scroll-arrow.next');
+            const artworks = document.querySelectorAll('.artwork');
+            const disclaimerBtn = document.getElementById('disclaimer-btn');
+            const disclaimerModal = document.getElementById('disclaimer-modal');
+            const closeDisclaimer = document.getElementById('close-disclaimer');
+            const disclaimerCloseBtn = document.getElementById('disclaimer-close-btn');
+            const ageVerification = document.getElementById('age-verification');
+            const ageYes = document.getElementById('age-yes');
+            const ageNo = document.getElementById('age-no');
+            
+            // 当前走廊位置
+            let currentPosition = 0;
+            const totalSections = gallerySections.length;
+            
+            // 进入年龄验证
+            function enterAgeVerification() {
+                entryPage.classList.add('animate-door-open');
+                
+                setTimeout(() => {
+                    entryPage.classList.add('hidden');
+                    ageVerification.classList.remove('hidden');
+                    ageVerification.classList.add('animate-fade-in');
+                }, 1000);
+            }
+            
+            // 进入画廊
+            function enterGallery() {
+                ageVerification.classList.add('hidden');
+                galleryPage.classList.remove('hidden');
+                galleryPage.classList.add('animate-fade-in');
+            }
+            
+            // 返回入口
+            function goBack() {
+                galleryPage.classList.add('hidden');
+                entryPage.classList.remove('hidden');
+                entryPage.classList.remove('animate-door-open');
+                
+                // 重置走廊位置
+                currentPosition = 0;
+                updateGalleryPosition();
+            }
+            
+            // 更新画廊位置
+            function updateGalleryPosition() {
+                const translateValue = -currentPosition * 100;
+                galleryScroll.style.transform = `translateX(${translateValue}%)`;
+                
+                // 更新导航点
+                navDots.forEach((dot, index) => {
+                    if (index === currentPosition) {
+                        dot.classList.add('active');
+                    } else {
+                        dot.classList.remove('active');
+                    }
+                });
+            }
+            
+            // 下一个走廊
+            function nextSection() {
+                if (currentPosition < totalSections - 1) {
+                    currentPosition++;
+                    updateGalleryPosition();
+                }
+            }
+            
+            // 上一个走廊
+            function prevSection() {
+                if (currentPosition > 0) {
+                    currentPosition--;
+                    updateGalleryPosition();
+                }
+            }
+            
+
+            
+
+            
+            // 打开免责声明
+            function openDisclaimer() {
+                disclaimerModal.classList.remove('hidden');
+            }
+            
+            // 关闭免责声明
+            function closeDisclaimerModal() {
+                disclaimerModal.classList.add('hidden');
+            }
+            
+            // 事件监听
+            enterBtn.addEventListener('click', enterAgeVerification);
+            backBtn.addEventListener('click', goBack);
+            nextBtn.addEventListener('click', nextSection);
+            prevBtn.addEventListener('click', prevSection);
+            disclaimerBtn.addEventListener('click', openDisclaimer);
+            closeDisclaimer.addEventListener('click', closeDisclaimerModal);
+            disclaimerCloseBtn.addEventListener('click', closeDisclaimerModal);
+            
+            // 年龄验证事件
+            ageYes.addEventListener('click', enterGallery);
+            ageNo.addEventListener('click', () => {
+                ageVerification.classList.add('hidden');
+                entryPage.classList.remove('hidden');
+                entryPage.classList.remove('animate-door-open');
+            });
+            
+            // 导航点点击事件
+            navDots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentPosition = index;
+                    updateGalleryPosition();
+                });
+            });
+            
+
+            
+            // 键盘导航
+            document.addEventListener('keydown', (event) => {
+                if (!galleryPage.classList.contains('hidden')) {
+                    switch (event.key) {
+                        case 'ArrowRight':
+                            nextSection();
+                            break;
+                        case 'ArrowLeft':
+                            prevSection();
+                            break;
+                        case 'Escape':
+                            if (!disclaimerModal.classList.contains('hidden')) {
+                                closeDisclaimerModal();
+                            }
+                            break;
+                    }
+                } else if (!ageVerification.classList.contains('hidden')) {
+                    // 在年龄验证页面
+                    switch (event.key) {
+                        case 'ArrowUp':
+                        case 'ArrowDown':
+                            // 切换按钮焦点
+                            if (document.activeElement === ageYes) {
+                                ageNo.focus();
+                            } else {
+                                ageYes.focus();
+                            }
+                            break;
+                        case 'Enter':
+                            if (document.activeElement === ageYes) {
+                                enterGallery();
+                            } else {
+                                ageVerification.classList.add('hidden');
+                                entryPage.classList.remove('hidden');
+                                entryPage.classList.remove('animate-door-open');
+                            }
+                            break;
+                    }
+                } else if (event.key === ' ' || event.key === 'Enter') {
+                    // 在入口页面按空格键或回车键进入年龄验证
+                    enterAgeVerification();
+                }
+            });
+            
+            // 触摸滑动支持
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            galleryPage.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+            
+            galleryPage.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+            
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const swipeDistance = touchEndX - touchStartX;
+                
+                if (Math.abs(swipeDistance) > swipeThreshold) {
+                    if (swipeDistance > 0) {
+                        prevSection();
+                    } else {
+                        nextSection();
+                    }
+                }
+            }
+            
+            // 自动播放
+            let autoplayInterval;
+            
+            function startAutoplay() {
+                autoplayInterval = setInterval(() => {
+                    currentPosition = (currentPosition + 1) % totalSections;
+                    updateGalleryPosition();
+                }, 5000);
+            }
+            
+            function stopAutoplay() {
+                clearInterval(autoplayInterval);
+            }
+            
+            // 鼠标移动时暂停自动播放
+            galleryPage.addEventListener('mousemove', stopAutoplay);
+            galleryPage.addEventListener('mouseleave', startAutoplay);
+            
+            // 初始化自动播放
+            startAutoplay();
+        });
+    </script>
+</body>
+</html>
