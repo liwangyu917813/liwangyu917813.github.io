@@ -14,6 +14,7 @@
                         primary: '#3B82F6',
                         secondary: '#10B981',
                         accent: '#F59E0B',
+                        like: '#EF4444',
                     },
                     fontFamily: {
                         inter: ['Inter', 'sans-serif'],
@@ -115,6 +116,20 @@
             }
             .modal-backdrop {
                 backdrop-filter: blur(8px);
+            }
+            .like-animation {
+                animation: likePulse 0.6s ease-in-out;
+            }
+            @keyframes likePulse {
+                0% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.3);
+                }
+                100% {
+                    transform: scale(1);
+                }
             }
         }
     </style>
@@ -304,6 +319,7 @@
                                 <option value="newest">最新上传</option>
                                 <option value="oldest">最早上传</option>
                                 <option value="random">随机排序</option>
+                                <option value="mostLiked">最多点赞</option>
                             </select>
                         </div>
                         <div class="flex items-center space-x-4">
@@ -375,11 +391,10 @@
                             <p id="viewerImageInfo" class="text-sm opacity-90">1/10</p>
                         </div>
                         <div class="flex items-center space-x-4">
-                            <button class="text-white hover:text-gray-300 transition-colors duration-300">
-                                <i class="fa fa-download mr-1"></i>下载
-                            </button>
-                            <button class="text-white hover:text-gray-300 transition-colors duration-300">
-                                <i class="fa fa-share mr-1"></i>分享
+                            <!-- 点赞按钮 -->
+                            <button id="likeBtn" class="flex items-center space-x-1 text-white hover:text-like transition-all duration-300">
+                                <i class="fa fa-heart text-lg"></i>
+                                <span id="likeCount" class="text-sm">0</span>
                             </button>
                         </div>
                     </div>
@@ -448,6 +463,10 @@
         let hasMoreImages = true;
         let currentImageIndex = 0;
 
+        // 点赞数据
+        let likeData = {};
+        let userLikes = new Set();
+
         // DOM元素
         const elements = {
             welcomePage: document.getElementById('welcomePage'),
@@ -482,7 +501,9 @@
             modalContent: document.getElementById('modalContent'),
             closeModal: document.getElementById('closeModal'),
             otherCategoryImage: document.getElementById('otherCategoryImage'),
-            otherCategoryPlaceholder: document.getElementById('otherCategoryPlaceholder')
+            otherCategoryPlaceholder: document.getElementById('otherCategoryPlaceholder'),
+            likeBtn: document.getElementById('likeBtn'),
+            likeCount: document.getElementById('likeCount')
         };
 
         // 初始化
@@ -490,6 +511,7 @@
             bindEvents();
             checkAgeVerification();
             setupOtherCategoryCover();
+            loadLikeData();
         }
 
         // 设置"其他"分类封面
@@ -516,6 +538,76 @@
                     elements.otherCategoryImage.classList.add('hidden');
                     elements.otherCategoryPlaceholder.classList.remove('hidden');
                 };
+            }
+        }
+
+        // 加载点赞数据
+        function loadLikeData() {
+            const savedLikes = localStorage.getItem('likeData');
+            const savedUserLikes = localStorage.getItem('userLikes');
+            
+            if (savedLikes) {
+                likeData = JSON.parse(savedLikes);
+            }
+            
+            if (savedUserLikes) {
+                userLikes = new Set(JSON.parse(savedUserLikes));
+            }
+        }
+
+        // 保存点赞数据
+        function saveLikeData() {
+            localStorage.setItem('likeData', JSON.stringify(likeData));
+            localStorage.setItem('userLikes', JSON.stringify([...userLikes]));
+        }
+
+        // 获取图片的点赞数量
+        function getLikeCount(imageSrc) {
+            return likeData[imageSrc] || 0;
+        }
+
+        // 检查用户是否已点赞
+        function hasUserLiked(imageSrc) {
+            return userLikes.has(imageSrc);
+        }
+
+        // 点赞/取消点赞
+        function toggleLike(imageSrc) {
+            if (hasUserLiked(imageSrc)) {
+                // 取消点赞
+                likeData[imageSrc] = Math.max(0, (likeData[imageSrc] || 0) - 1);
+                userLikes.delete(imageSrc);
+            } else {
+                // 点赞
+                likeData[imageSrc] = (likeData[imageSrc] || 0) + 1;
+                userLikes.add(imageSrc);
+            }
+            
+            saveLikeData();
+            updateLikeDisplay(imageSrc);
+            
+            // 添加点赞动画
+            elements.likeBtn.classList.add('like-animation');
+            setTimeout(() => {
+                elements.likeBtn.classList.remove('like-animation');
+            }, 600);
+        }
+
+        // 更新点赞显示
+        function updateLikeDisplay(imageSrc) {
+            const count = getLikeCount(imageSrc);
+            const liked = hasUserLiked(imageSrc);
+            
+            elements.likeCount.textContent = count;
+            
+            if (liked) {
+                elements.likeBtn.classList.add('text-like');
+                elements.likeBtn.querySelector('i').classList.add('fa-heart');
+                elements.likeBtn.querySelector('i').classList.remove('fa-heart-o');
+            } else {
+                elements.likeBtn.classList.remove('text-like');
+                elements.likeBtn.querySelector('i').classList.add('fa-heart-o');
+                elements.likeBtn.querySelector('i').classList.remove('fa-heart');
             }
         }
 
@@ -565,6 +657,10 @@
                 if (e.target === elements.imageViewer) {
                     closeImageViewer();
                 }
+            });
+            elements.likeBtn.addEventListener('click', () => {
+                const currentImageSrc = currentImages[currentImageIndex];
+                toggleLike(currentImageSrc);
             });
 
             // 投稿弹窗事件
@@ -679,6 +775,14 @@
                     // 随机排序
                     currentImages = shuffleArray(currentImages);
                     break;
+                case 'mostLiked':
+                    // 按点赞数排序
+                    currentImages.sort((a, b) => {
+                        const likesA = getLikeCount(a);
+                        const likesB = getLikeCount(b);
+                        return likesB - likesA;
+                    });
+                    break;
             }
         }
 
@@ -737,6 +841,9 @@
                 imageItem.className = 'masonry-item fade-in scale-hover cursor-pointer';
                 imageItem.style.animationDelay = `${index * 0.1}s`;
                 
+                const likeCount = getLikeCount(src);
+                const liked = hasUserLiked(src);
+                
                 imageItem.innerHTML = `
                     <div class="relative group">
                         <img src="${src}" alt="图片 ${index + 1}" 
@@ -746,6 +853,11 @@
                             <button class="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-300 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
                                 <i class="fa fa-expand mr-2"></i>查看大图
                             </button>
+                        </div>
+                        <!-- 图片底部信息 -->
+                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-60 rounded-full px-3 py-1 flex items-center space-x-1">
+                            <i class="fa ${liked ? 'fa-heart text-like' : 'fa-heart-o text-white'} text-sm"></i>
+                            <span class="text-white text-xs">${likeCount}</span>
                         </div>
                     </div>
                 `;
@@ -784,6 +896,10 @@
             elements.viewerImage.src = imageSrc;
             elements.viewerImageTitle.textContent = `图片 ${index + 1}`;
             elements.viewerImageInfo.textContent = `${index + 1}/${currentImages.length}`;
+            
+            // 更新点赞显示
+            updateLikeDisplay(imageSrc);
+            
             elements.imageViewer.classList.remove('hidden');
             
             // 禁止背景滚动
@@ -850,6 +966,11 @@
                         break;
                     case 'ArrowRight':
                         showNextImage();
+                        break;
+                    case ' ':
+                        e.preventDefault();
+                        const currentImageSrc = currentImages[currentImageIndex];
+                        toggleLike(currentImageSrc);
                         break;
                 }
             } else if (!elements.submitModal.classList.contains('hidden')) {
