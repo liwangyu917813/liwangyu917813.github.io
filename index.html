@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -347,10 +348,74 @@
             </div>
         </div>
     </section>
+    
+    <!-- 强制阅读的免责协议 -->
+    <div id="mandatory-disclaimer" class="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded-lg max-w-lg w-full mx-4 overflow-hidden">
+            <div class="p-4 flex justify-between items-center border-b bg-gray-100">
+                <h3 class="text-xl font-bold text-secondary">免责协议</h3>
+            </div>
+            <div id="disclaimer-content" class="p-6 max-h-[60vh] overflow-y-auto">
+                <h4 class="font-bold text-lg mb-3">重要声明</h4>
+                <p class="mb-3">欢迎访问王府小吃街网站。在您进入本网站之前，请仔细阅读以下免责协议。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">内容声明</h4>
+                <p class="mb-3">1. 本网站提供的所有内容仅供学习和研究目的使用，所有图片和文字均为用户投稿，网站制作者不拥有这些内容的版权。</p>
+                <p class="mb-3">2. 本网站上的内容仅代表投稿者个人观点，不代表网站制作者的立场。</p>
+                <p class="mb-3">3. 网站制作者对所有内容的真实性、准确性、完整性不作任何保证，不对因内容使用而产生的任何直接或间接损失承担责任。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">使用条款</h4>
+                <p class="mb-3">1. 您必须年满18周岁才能访问本网站的全部内容。</p>
+                <p class="mb-3">2. 您同意仅出于合法目的使用本网站，不得将本网站用于任何非法活动。</p>
+                <p class="mb-3">3. 您承认并同意，访问和使用本网站的风险由您自行承担。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">免责声明</h4>
+                <p class="mb-3">1. 网站制作者对本网站内容的更新不承担任何义务，有权随时更改或删除任何内容。</p>
+                <p class="mb-3">2. 网站制作者对因使用本网站而导致的任何直接或间接损失不承担任何责任。</p>
+                <p class="mb-3">3. 网站制作者对本网站的可用性、稳定性不作任何保证，不承担因网站故障或无法访问而导致的任何损失。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">知识产权</h4>
+                <p class="mb-3">1. 本网站的所有内容（包括但不限于图片、文字、设计等）的知识产权归原作者所有。</p>
+                <p class="mb-3">2. 未经原作者许可，任何人不得复制、传播、修改或使用本网站的任何内容。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">隐私政策</h4>
+                <p class="mb-3">1. 本网站尊重用户的隐私，不会收集或存储用户的个人信息。</p>
+                <p class="mb-3">2. 本网站可能会使用本地存储记录用户的同意状态，以便提供更好的用户体验。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">修改条款</h4>
+                <p class="mb-3">1. 网站制作者有权随时修改本免责协议，修改后的协议将在本网站上公布。</p>
+                <p class="mb-3">2. 您继续使用本网站即表示您接受修改后的免责协议。</p>
+                
+                <h4 class="font-bold text-lg mb-3 mt-4">法律适用</h4>
+                <p class="mb-3">1. 本免责协议的解释和适用均受中华人民共和国法律管辖。</p>
+                <p class="mb-3">2. 如您对本免责协议有任何疑问，请停止使用本网站。</p>
+                
+                <div class="mt-6 text-center text-sm text-gray-500">
+                    <p>© 2025 王府小吃街 - 本免责协议最后更新日期：2025年10月29日</p>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50">
+                <div class="flex items-center mb-4">
+                    <input type="checkbox" id="agree-checkbox" class="mr-2 h-5 w-5 text-blue-600" disabled>
+                    <label for="agree-checkbox" class="text-gray-700">我已阅读并同意以上免责协议</label>
+                </div>
+                <div class="flex justify-end">
+                    <button id="disagree-btn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors mr-2">
+                        不同意，退出
+                    </button>
+                    <button id="agree-btn" class="px-4 py-2 bg-secondary text-white rounded hover:bg-gray-700 transition-colors" disabled>
+                        我已阅读并同意
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 获取页面元素
+            // ==============================================
+            // 页面元素获取
+            // ==============================================
             const entryPage = document.getElementById('entry-page');
             const galleryPage = document.getElementById('gallery-page');
             const enterBtn = document.getElementById('enter-btn');
@@ -360,7 +425,6 @@
             const navDots = document.querySelectorAll('.nav-dot');
             const prevBtn = document.querySelector('.scroll-arrow.prev');
             const nextBtn = document.querySelector('.scroll-arrow.next');
-            const artworks = document.querySelectorAll('.artwork');
             const disclaimerBtn = document.getElementById('disclaimer-btn');
             const disclaimerModal = document.getElementById('disclaimer-modal');
             const closeDisclaimer = document.getElementById('close-disclaimer');
@@ -368,12 +432,27 @@
             const ageVerification = document.getElementById('age-verification');
             const ageYes = document.getElementById('age-yes');
             const ageNo = document.getElementById('age-no');
+            const mandatoryDisclaimer = document.getElementById('mandatory-disclaimer');
+            const disclaimerContent = document.getElementById('disclaimer-content');
+            const agreeCheckbox = document.getElementById('agree-checkbox');
+            const agreeBtn = document.getElementById('agree-btn');
+            const disagreeBtn = document.getElementById('disagree-btn');
             
-            // 当前走廊位置
-            let currentPosition = 0;
-            const totalSections = gallerySections.length;
+            // ==============================================
+            // 全局变量
+            // ==============================================
+            let currentPosition = 0; // 当前画廊位置
+            const totalSections = gallerySections.length; // 总画廊数量
+            let autoplayInterval = null; // 自动播放定时器
+            const hasAgreedToDisclaimer = localStorage.getItem('hasAgreedToDisclaimer') === 'true'; // 用户是否已同意免责协议
             
-            // 进入年龄验证
+            // ==============================================
+            // 页面导航功能
+            // ==============================================
+            
+            /**
+             * 进入年龄验证页面
+             */
             function enterAgeVerification() {
                 entryPage.classList.add('animate-door-open');
                 
@@ -384,25 +463,75 @@
                 }, 1000);
             }
             
-            // 进入画廊
-            function enterGallery() {
+            /**
+             * 显示强制阅读的免责协议
+             */
+            function showDisclaimer() {
                 ageVerification.classList.add('hidden');
-                galleryPage.classList.remove('hidden');
-                galleryPage.classList.add('animate-fade-in');
+                mandatoryDisclaimer.classList.remove('hidden');
+                mandatoryDisclaimer.classList.add('animate-fade-in');
+                
+                // 重置滚动位置和同意状态
+                disclaimerContent.scrollTop = 0;
+                agreeCheckbox.checked = false;
+                agreeCheckbox.disabled = true;
+                agreeBtn.disabled = true;
+                
+                // 添加滚动监听
+                disclaimerContent.addEventListener('scroll', checkScrollPosition);
             }
             
-            // 返回入口
+            /**
+             * 检查用户是否阅读完免责协议
+             */
+            function checkScrollPosition() {
+                const { scrollTop, scrollHeight, clientHeight } = disclaimerContent;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10; // 允许10像素的误差
+                
+                if (isAtBottom) {
+                    agreeCheckbox.checked = true;
+                    agreeCheckbox.disabled = false;
+                    agreeBtn.disabled = false;
+                    // 移除滚动监听
+                    disclaimerContent.removeEventListener('scroll', checkScrollPosition);
+                }
+            }
+            
+            /**
+             * 进入画廊页面
+             */
+            function enterGallery() {
+                mandatoryDisclaimer.classList.add('hidden');
+                galleryPage.classList.remove('hidden');
+                galleryPage.classList.add('animate-fade-in');
+                
+                // 启动自动播放
+                startAutoplay();
+            }
+            
+            /**
+             * 返回入口页面
+             */
             function goBack() {
                 galleryPage.classList.add('hidden');
                 entryPage.classList.remove('hidden');
                 entryPage.classList.remove('animate-door-open');
                 
-                // 重置走廊位置
+                // 停止自动播放
+                stopAutoplay();
+                
+                // 重置画廊位置
                 currentPosition = 0;
                 updateGalleryPosition();
             }
             
-            // 更新画廊位置
+            // ==============================================
+            // 画廊浏览功能
+            // ==============================================
+            
+            /**
+             * 更新画廊位置
+             */
             function updateGalleryPosition() {
                 const translateValue = -currentPosition * 100;
                 galleryScroll.style.transform = `translateX(${translateValue}%)`;
@@ -417,7 +546,9 @@
                 });
             }
             
-            // 下一个走廊
+            /**
+             * 浏览下一个画廊
+             */
             function nextSection() {
                 if (currentPosition < totalSections - 1) {
                     currentPosition++;
@@ -425,7 +556,9 @@
                 }
             }
             
-            // 上一个走廊
+            /**
+             * 浏览上一个画廊
+             */
             function prevSection() {
                 if (currentPosition > 0) {
                     currentPosition--;
@@ -433,33 +566,116 @@
                 }
             }
             
-
+            // ==============================================
+            // 自动播放功能
+            // ==============================================
             
-
+            /**
+             * 启动自动播放
+             */
+            function startAutoplay() {
+                if (!autoplayInterval) {
+                    autoplayInterval = setInterval(() => {
+                        currentPosition = (currentPosition + 1) % totalSections;
+                        updateGalleryPosition();
+                    }, 5000);
+                }
+            }
             
-            // 打开免责声明
+            /**
+             * 停止自动播放
+             */
+            function stopAutoplay() {
+                if (autoplayInterval) {
+                    clearInterval(autoplayInterval);
+                    autoplayInterval = null;
+                }
+            }
+            
+            // ==============================================
+            // 触摸滑动支持
+            // ==============================================
+            
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            /**
+             * 处理触摸滑动
+             */
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const swipeDistance = touchEndX - touchStartX;
+                
+                if (Math.abs(swipeDistance) > swipeThreshold) {
+                    if (swipeDistance > 0) {
+                        prevSection();
+                    } else {
+                        nextSection();
+                    }
+                }
+            }
+            
+            // ==============================================
+            // 免责声明功能
+            // ==============================================
+            
+            /**
+             * 打开免责声明
+             */
             function openDisclaimer() {
                 disclaimerModal.classList.remove('hidden');
             }
             
-            // 关闭免责声明
+            /**
+             * 关闭免责声明
+             */
             function closeDisclaimerModal() {
                 disclaimerModal.classList.add('hidden');
             }
             
+            // ==============================================
             // 事件监听
+            // ==============================================
+            
+            // 入口页面事件
             enterBtn.addEventListener('click', enterAgeVerification);
+            
+            // 画廊页面事件
             backBtn.addEventListener('click', goBack);
             nextBtn.addEventListener('click', nextSection);
             prevBtn.addEventListener('click', prevSection);
             disclaimerBtn.addEventListener('click', openDisclaimer);
+            
+            // 免责声明事件
             closeDisclaimer.addEventListener('click', closeDisclaimerModal);
             disclaimerCloseBtn.addEventListener('click', closeDisclaimerModal);
             
             // 年龄验证事件
-            ageYes.addEventListener('click', enterGallery);
+            ageYes.addEventListener('click', () => {
+                // 如果用户已经同意过免责协议，直接进入画廊
+                if (hasAgreedToDisclaimer) {
+                    enterGallery();
+                } else {
+                    // 否则显示免责协议
+                    showDisclaimer();
+                }
+            });
+            
             ageNo.addEventListener('click', () => {
                 ageVerification.classList.add('hidden');
+                entryPage.classList.remove('hidden');
+                entryPage.classList.remove('animate-door-open');
+            });
+            
+            // 强制免责协议事件
+            agreeBtn.addEventListener('click', () => {
+                // 记录用户同意状态
+                localStorage.setItem('hasAgreedToDisclaimer', 'true');
+                enterGallery();
+            });
+            
+            disagreeBtn.addEventListener('click', () => {
+                mandatoryDisclaimer.classList.add('hidden');
                 entryPage.classList.remove('hidden');
                 entryPage.classList.remove('animate-door-open');
             });
@@ -472,10 +688,23 @@
                 });
             });
             
-
+            // 触摸滑动事件
+            galleryPage.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
             
-            // 键盘导航
+            galleryPage.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, { passive: true });
+            
+            // 自动播放事件
+            galleryPage.addEventListener('mousemove', stopAutoplay);
+            galleryPage.addEventListener('mouseleave', startAutoplay);
+            
+            // 键盘导航事件
             document.addEventListener('keydown', (event) => {
+                // 画廊页面键盘导航
                 if (!galleryPage.classList.contains('hidden')) {
                     switch (event.key) {
                         case 'ArrowRight':
@@ -490,8 +719,9 @@
                             }
                             break;
                     }
-                } else if (!ageVerification.classList.contains('hidden')) {
-                    // 在年龄验证页面
+                }
+                // 年龄验证页面键盘导航
+                else if (!ageVerification.classList.contains('hidden')) {
                     switch (event.key) {
                         case 'ArrowUp':
                         case 'ArrowDown':
@@ -504,7 +734,13 @@
                             break;
                         case 'Enter':
                             if (document.activeElement === ageYes) {
-                                enterGallery();
+                                // 如果用户已经同意过免责协议，直接进入画廊
+                                if (hasAgreedToDisclaimer) {
+                                    enterGallery();
+                                } else {
+                                    // 否则显示免责协议
+                                    showDisclaimer();
+                                }
                             } else {
                                 ageVerification.classList.add('hidden');
                                 entryPage.classList.remove('hidden');
@@ -512,58 +748,12 @@
                             }
                             break;
                     }
-                } else if (event.key === ' ' || event.key === 'Enter') {
-                    // 在入口页面按空格键或回车键进入年龄验证
+                }
+                // 入口页面键盘导航
+                else if (event.key === ' ' || event.key === 'Enter') {
                     enterAgeVerification();
                 }
             });
-            
-            // 触摸滑动支持
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            galleryPage.addEventListener('touchstart', (e) => {
-                touchStartX = e.changedTouches[0].screenX;
-            }, { passive: true });
-            
-            galleryPage.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                handleSwipe();
-            }, { passive: true });
-            
-            function handleSwipe() {
-                const swipeThreshold = 50;
-                const swipeDistance = touchEndX - touchStartX;
-                
-                if (Math.abs(swipeDistance) > swipeThreshold) {
-                    if (swipeDistance > 0) {
-                        prevSection();
-                    } else {
-                        nextSection();
-                    }
-                }
-            }
-            
-            // 自动播放
-            let autoplayInterval;
-            
-            function startAutoplay() {
-                autoplayInterval = setInterval(() => {
-                    currentPosition = (currentPosition + 1) % totalSections;
-                    updateGalleryPosition();
-                }, 5000);
-            }
-            
-            function stopAutoplay() {
-                clearInterval(autoplayInterval);
-            }
-            
-            // 鼠标移动时暂停自动播放
-            galleryPage.addEventListener('mousemove', stopAutoplay);
-            galleryPage.addEventListener('mouseleave', startAutoplay);
-            
-            // 初始化自动播放
-            startAutoplay();
         });
     </script>
 </body>
