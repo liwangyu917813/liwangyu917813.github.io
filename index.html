@@ -19,6 +19,7 @@
             accent: '#FF9F43',
             light: '#FFF2F9',
             dark: '#4A4A4A',
+            love: '#FF3366'
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -26,6 +27,13 @@
           animation: {
             'bounce-slow': 'bounce 3s infinite',
             'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow': 'glow 2s ease-in-out infinite alternate'
+          },
+          keyframes: {
+            glow: {
+              '0%': { textShadow: '0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FF6B8B, 0 0 20px #FF6B8B' },
+              '100%': { textShadow: '0 0 10px #fff, 0 0 20px #fff, 0 0 30px #FF6B8B, 0 0 40px #FF6B8B' }
+            }
           }
         }
       }
@@ -67,6 +75,12 @@
       .job-card {
         @apply bg-white rounded-lg shadow p-3 card-hover cursor-pointer;
       }
+      .blush-mode {
+        @apply border-2 border-love animate-pulse-slow;
+      }
+      .harem-badge {
+        @apply absolute top-2 right-2 bg-love text-white text-xs px-2 py-1 rounded-full;
+      }
     }
   </style>
 </head>
@@ -79,8 +93,13 @@
       <div class="flex items-center">
         <h1 class="text-3xl font-bold text-primary mr-4">心动瞬间</h1>
         <span class="bg-accent text-white text-sm px-3 py-1 rounded-full">模拟恋爱游戏</span>
+        <span id="week-indicator" class="ml-4 bg-secondary text-white text-sm px-3 py-1 rounded-full hidden">二周目</span>
       </div>
       <div class="flex items-center space-x-4">
+        <div id="blush-mode-indicator" class="hidden bg-love text-white text-sm px-3 py-1 rounded-full flex items-center">
+          <i class="fa fa-heart mr-1"></i> 红润模式
+          <span id="blush-days" class="ml-1">3天</span>
+        </div>
         <div class="flex items-center">
           <i class="fa fa-money text-green-600 mr-1"></i>
           <span id="money-display" class="font-bold">500</span>
@@ -103,6 +122,13 @@
         <section id="character-selection-page" class="page active">
           <h2 class="text-2xl font-bold mb-6 text-center">选择你心仪的对象</h2>
           
+          <div id="harem-section" class="mb-8 hidden">
+            <h3 class="text-xl font-bold mb-4">你的后宫</h3>
+            <div id="harem-container" class="flex flex-wrap gap-4">
+              <!-- 后宫角色将在这里显示 -->
+            </div>
+          </div>
+          
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- 角色A -->
             <div class="character-card" data-character="0">
@@ -113,6 +139,7 @@
                   <h3 class="text-white text-xl font-bold">啵啵姐</h3>
                   <p class="text-white text-sm">知性御姐 · 图书馆管理员</p>
                 </div>
+                <span class="harem-badge hidden" data-character="0">后宫</span>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-600 mb-3">优雅知性，热爱阅读，总是在图书馆的角落里安静地看书。</p>
@@ -131,6 +158,7 @@
                   <h3 class="text-white text-xl font-bold">鹏哥</h3>
                   <p class="text-white text-sm">神秘酷哥 · 体育教练</p>
                 </div>
+                <span class="harem-badge hidden" data-character="1">后宫</span>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-600 mb-3">沉默寡言，身手矫健，总是戴着墨镜，没人知道他的过去。</p>
@@ -149,6 +177,7 @@
                   <h3 class="text-white text-xl font-bold">香波哥</h3>
                   <p class="text-white text-sm">成熟稳重 · 公司总裁</p>
                 </div>
+                <span class="harem-badge hidden" data-character="2">后宫</span>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-600 mb-3">事业有成，温文尔雅，举手投足间都散发着成熟男人的魅力。</p>
@@ -167,6 +196,7 @@
                   <h3 class="text-white text-xl font-bold">晶晶姐</h3>
                   <p class="text-white text-sm">温柔可爱 · 甜点师</p>
                 </div>
+                <span class="harem-badge hidden" data-character="3">后宫</span>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-600 mb-3">心地善良，笑容甜美，擅长制作各种美味的甜点。</p>
@@ -185,6 +215,7 @@
                   <h3 class="text-white text-xl font-bold">飞飞哥</h3>
                   <p class="text-white text-sm">阳光开朗 · 音乐教师</p>
                 </div>
+                <span class="harem-badge hidden" data-character="4">后宫</span>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-600 mb-3">热情洋溢，多才多艺，总能给身边的人带来快乐。</p>
@@ -212,6 +243,9 @@
               <button id="date-btn" class="bg-accent text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-50 flex items-center">
                 <i class="fa fa-heart mr-2"></i> 约会
               </button>
+              <button id="propose-btn" class="bg-love text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-love focus:ring-opacity-50 flex items-center hidden">
+                <i class="fa fa-diamond mr-2"></i> 求婚
+              </button>
               <button id="diary-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-opacity-90 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-opacity-50 flex items-center">
                 <i class="fa fa-book mr-2"></i> 日记
               </button>
@@ -221,13 +255,14 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- 左侧：角色信息 -->
             <div class="lg:col-span-1">
-              <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div id="character-card-wrapper" class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="relative">
                   <img id="character-detail-image" src="" alt="角色详情" class="w-full h-64 object-cover">
                   <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                     <h3 id="character-detail-name" class="text-white text-xl font-bold">角色名称</h3>
                     <p id="character-detail-title" class="text-white text-sm">角色头衔</p>
                   </div>
+                  <span id="harem-indicator" class="harem-badge hidden">后宫</span>
                 </div>
                 <div class="p-4">
                   <div class="mb-4">
@@ -297,6 +332,23 @@
                 </div>
               </div>
               
+              <!-- 求婚区域 (默认隐藏) -->
+              <div id="propose-section" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
+                <h3 class="text-xl font-bold mb-4 text-love animate-glow">求婚</h3>
+                
+                <div class="text-center p-6">
+                  <p class="mb-6 text-lg">你确定要向 <span id="propose-character-name" class="font-bold text-love"></span> 求婚吗？</p>
+                  <div class="flex justify-center space-x-4">
+                    <button id="accept-propose" class="btn-primary">
+                      <i class="fa fa-heart mr-2"></i> 确定求婚
+                    </button>
+                    <button id="cancel-propose" class="btn-outline">
+                      <i class="fa fa-times mr-2"></i> 取消
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
               <!-- 日记区域 (默认隐藏) -->
               <div id="diary-section" class="bg-white rounded-xl shadow-lg p-6 mb-6 hidden">
                 <h3 class="text-xl font-bold mb-4">日记</h3>
@@ -322,16 +374,16 @@
         <!-- 结局页面 -->
         <section id="ending-page" class="page hidden">
           <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
-            <h2 class="text-2xl font-bold mb-6 text-center">游戏结局</h2>
+            <h2 class="text-2xl font-bold mb-6 text-center">告白成功</h2>
             
             <div class="mb-6 text-center">
-              <img id="ending-image" src="" alt="结局图片" class="w-64 h-64 object-cover rounded-full mx-auto mb-4 border-4 border-primary">
-              <h3 id="ending-title" class="text-xl font-bold text-primary mb-2">结局标题</h3>
-              <p id="ending-description" class="text-gray-600">结局描述</p>
+              <img id="ending-image" src="" alt="结局图片" class="w-64 h-64 object-cover rounded-full mx-auto mb-4 border-4 border-love">
+              <h3 id="ending-title" class="text-xl font-bold text-love mb-2">加入后宫</h3>
+              <p id="ending-description" class="text-gray-600">恭喜！你成功攻略了TA，现在可以继续攻略其他角色了。</p>
             </div>
             
             <div class="text-center">
-              <button id="restart-game" class="btn-primary">重新开始</button>
+              <button id="continue-game" class="btn-primary">继续游戏</button>
             </div>
           </div>
         </section>
@@ -353,15 +405,24 @@
       currentCharacter: null,
       clues: [],
       interactions: [],
+      blushMode: {
+        active: false,
+        daysRemaining: 0,
+        characterId: -1
+      },
+      harem: [], // 存储已攻略的角色ID
+      week: 1, // 周目数
       characters: [
         {
           id: 0,
           name: "啵啵姐",
           title: "知性御姐 · 图书馆管理员",
           image: "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/51b69d279e4943028d5bbfc9e25ca362.jpeg~tplv-a9rns2rl98-24:720:720.jpeg?rcl=202511021920054FFF42CCAC7804EEC2A5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762687205&x-signature=womRcKMGS7klMrjKmwsXdf78nZM%3D",
+          haremImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFE4E1'/%3E%3Ccircle cx='50' cy='30' r='15' fill='%23FFB6C1'/%3E%3Cpath d='M50 50 Q70 70, 50 90 Q30 70, 50 50' fill='%23FFB6C1'/%3E%3C/svg%3E",
           personality: "优雅知性，热爱爱阅读，总是在图书馆的角落里安静地看书。",
           likes: ["书籍", "咖啡", "音乐"],
           affection: 0,
+          isHarem: false,
           dialogues: [
             {
               id: 0,
@@ -415,9 +476,11 @@
           name: "鹏哥",
           title: "神秘酷哥 · 体育教练",
           image: "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/cd2d7d88c7ce4fb491c282aa359de240.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=202511021920054FFF42CCAC7804EEC2A5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762687205&x-signature=lqt58sUJrMXZM7uE19AMAcVBHso%3D",
+          haremImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E6F2FF'/%3E%3Ccircle cx='50' cy='30' r='15' fill='%2399CCFF'/%3E%3Cpath d='M50 50 Q70 70, 50 90 Q30 70, 50 50' fill='%2399CCFF'/%3E%3C/svg%3E",
           personality: "沉默寡言，身手矫健，总是戴着墨镜，没人知道他的过去。",
           likes: ["运动", "游戏", "电子产品"],
           affection: 0,
+          isHarem: false,
           dialogues: [
             {
               id: 0,
@@ -471,9 +534,11 @@
           name: "香波哥",
           title: "成熟稳重 · 公司总裁",
           image: "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/c6d542f684ce42f5ab91cd7d6ee64fde.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=202511021920054FFF42CCAC7804EEC2A5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762687205&x-signature=O0OZgejwvXJhQguwKC5lRpNdgOo%3D",
+          haremImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23F5F5F5'/%3E%3Ccircle cx='50' cy='30' r='15' fill='%23CCCCCC'/%3E%3Cpath d='M50 50 Q70 70, 50 90 Q30 70, 50 50' fill='%23CCCCCC'/%3E%3C/svg%3E",
           personality: "事业有成，温文尔雅，举手投足间都散发着成熟男人的魅力。",
           likes: ["红酒", "书法", "古典艺术"],
           affection: 0,
+          isHarem: false,
           dialogues: [
             {
               id: 0,
@@ -527,9 +592,11 @@
           name: "晶晶姐",
           title: "温柔可爱 · 甜点师",
           image: "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/f62afbbe16204edfb46496c5c0f1ca55.jpeg~tplv-a9rns2rl98-24:720:720.jpeg?rcl=202511021920054FFF42CCAC7804EEC2A5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762687205&x-signature=IIZ5v1w%2FhfBrw5l2ShG8V%2BwGrsA%3D",
+          haremImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23FFF0F5'/%3E%3Ccircle cx='50' cy='30' r='15' fill='%23FFCCDD'/%3E%3Cpath d='M50 50 Q70 70, 50 90 Q30 70, 50 50' fill='%23FFCCDD'/%3E%3C/svg%3E",
           personality: "心地善良，笑容甜美，擅长制作各种美味的甜点。",
           likes: ["甜点", "小动物", "手工制品"],
           affection: 0,
+          isHarem: false,
           dialogues: [
             {
               id: 0,
@@ -583,9 +650,11 @@
           name: "飞飞哥",
           title: "阳光开朗 · 音乐教师",
           image: "https://p3-flow-imagex-download-sign.byteimg.com/tos-cn-i-a9rns2rl98/0d90c2dd2c8a4da78ba023a3da191596.png~tplv-a9rns2rl98-24:720:720.jpeg?rcl=202511021920054FFF42CCAC7804EEC2A5&rk3s=8e244e95&rrcfp=8a172a1a&x-expires=1762687205&x-signature=ylMfctaeAa4Vs5yPvVEkgKj0b8M%3D",
+          haremImage: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23E6FFFA'/%3E%3Ccircle cx='50' cy='30' r='15' fill='%2399E6D4'/%3E%3Cpath d='M50 50 Q70 70, 50 90 Q30 70, 50 50' fill='%2399E6D4'/%3E%3C/svg%3E",
           personality: "热情洋溢，多才多艺，总能给身边的人带来快乐。",
           likes: ["户外活动", "乐器", "摄影"],
           affection: 0,
+          isHarem: false,
           dialogues: [
             {
               id: 0,
@@ -673,7 +742,11 @@
         { id: 5, name: "餐厅", price: 300, time: 2, likedBy: [2, 3], description: "在高档餐厅享用美食", reactions: {
           like: "他/她对这里的食物很满意，尤其喜欢某道菜。",
           dislike: "他/她看起来对这里的食物不太习惯。"
-        }}
+        }},
+        { id: 6, name: "酒店", price: 1000, time: 1, likedBy: [0, 1, 2, 3, 4], description: "在豪华酒店共度浪漫夜晚", reactions: {
+          like: "他/她脸颊微红，羞涩地点了点头，眼中闪烁着期待的光芒。",
+          dislike: "他/她犹豫了一下，但最终还是同意了你的邀请。"
+        }, requiresAffection: 60, specialEffect: "blushMode" }
       ],
       jobs: [
         { id: 0, name: "快餐店兼职", pay: 50, time: 1, description: "简单的体力劳动，收入不高但稳定。" },
@@ -692,7 +765,7 @@
     // 游戏状态
     const gameState = {
       currentDialogueId: 0,
-      currentSection: 'dialog' // 'dialog', 'gift', 'work', 'date', 'diary'
+      currentSection: 'dialog' // 'dialog', 'gift', 'work', 'date', 'diary', 'propose'
     };
     
     // DOM 元素
@@ -708,7 +781,9 @@
       detailTitle: document.getElementById('character-detail-title'),
       affectionValue: document.getElementById('affection-value'),
       affectionBar: document.getElementById('affection-bar'),
-      personality: document.getElementById('character-personality')
+      personality: document.getElementById('character-personality'),
+      cardWrapper: document.getElementById('character-card-wrapper'),
+      haremIndicator: document.getElementById('harem-indicator')
     };
     
     const sections = {
@@ -716,7 +791,8 @@
       gift: document.getElementById('gift-section'),
       work: document.getElementById('work-section'),
       date: document.getElementById('date-section'),
-      diary: document.getElementById('diary-section')
+      diary: document.getElementById('diary-section'),
+      propose: document.getElementById('propose-section')
     };
     
     const dialogElements = {
@@ -737,7 +813,17 @@
       endingTitle: document.getElementById('ending-title'),
       endingDescription: document.getElementById('ending-description'),
       diaryClues: document.getElementById('diary-clues'),
-      diaryInteractions: document.getElementById('diary-interactions')
+      diaryInteractions: document.getElementById('diary-interactions'),
+      proposeBtn: document.getElementById('propose-btn'),
+      proposeCharacterName: document.getElementById('propose-character-name'),
+      acceptPropose: document.getElementById('accept-propose'),
+      cancelPropose: document.getElementById('cancel-propose'),
+      blushModeIndicator: document.getElementById('blush-mode-indicator'),
+      blushDays: document.getElementById('blush-days'),
+      weekIndicator: document.getElementById('week-indicator'),
+      haremSection: document.getElementById('harem-section'),
+      haremContainer: document.getElementById('harem-container'),
+      continueGameBtn: document.getElementById('continue-game')
     };
     
     // 初始化游戏
@@ -762,19 +848,29 @@
         gameData.currentCharacter = parsedData.currentCharacter;
         gameData.clues = parsedData.clues || [];
         gameData.interactions = parsedData.interactions || [];
+        gameData.blushMode = parsedData.blushMode || { active: false, daysRemaining: 0, characterId: -1 };
+        gameData.harem = parsedData.harem || [];
+        gameData.week = parsedData.week || 1;
         
         // 加载角色数据
         for (let i = 0; i < gameData.characters.length; i++) {
           if (parsedData.characters && parsedData.characters[i]) {
             gameData.characters[i].affection = parsedData.characters[i].affection;
+            gameData.characters[i].isHarem = parsedData.characters[i].isHarem || false;
           }
         }
       }
+      
+      // 更新后宫徽章
+      updateHaremBadges();
       
       // 如果有当前角色，显示互动页面
       if (gameData.currentCharacter !== null) {
         showCharacterInteractionPage(gameData.currentCharacter);
       }
+      
+      // 更新后宫展示
+      updateHaremDisplay();
     }
     
     // 保存游戏数据
@@ -785,9 +881,13 @@
         currentCharacter: gameData.currentCharacter,
         clues: gameData.clues,
         interactions: gameData.interactions,
+        blushMode: gameData.blushMode,
+        harem: gameData.harem,
+        week: gameData.week,
         characters: gameData.characters.map(character => ({
           id: character.id,
-          affection: character.affection
+          affection: character.affection,
+          isHarem: character.isHarem
         }))
       };
       
@@ -800,11 +900,43 @@
       uiElements.moneyDisplay.textContent = gameData.money;
       uiElements.dayDisplay.textContent = gameData.day;
       
+      // 更新周目指示器
+      if (gameData.week > 1) {
+        uiElements.weekIndicator.textContent = `${gameData.week}周目`;
+        uiElements.weekIndicator.classList.remove('hidden');
+      } else {
+        uiElements.weekIndicator.classList.add('hidden');
+      }
+      
+      // 更新红润模式指示器
+      if (gameData.blushMode.active && gameData.blushMode.characterId === gameData.currentCharacter) {
+        uiElements.blushModeIndicator.classList.remove('hidden');
+        uiElements.blushDays.textContent = `${gameData.blushMode.daysRemaining}天`;
+        characterElements.cardWrapper.classList.add('blush-mode');
+      } else {
+        uiElements.blushModeIndicator.classList.add('hidden');
+        characterElements.cardWrapper.classList.remove('blush-mode');
+      }
+      
       // 如果有当前角色，更新角色信息
       if (gameData.currentCharacter !== null) {
         const character = gameData.characters[gameData.currentCharacter];
         characterElements.affectionValue.textContent = `${character.affection}/100`;
         characterElements.affectionBar.style.width = `${character.affection}%`;
+        
+        // 更新求婚按钮显示
+        if (character.affection >= 100 && !character.isHarem) {
+          uiElements.proposeBtn.classList.remove('hidden');
+        } else {
+          uiElements.proposeBtn.classList.add('hidden');
+        }
+        
+        // 更新后宫指示器
+        if (character.isHarem) {
+          characterElements.haremIndicator.classList.remove('hidden');
+        } else {
+          characterElements.haremIndicator.classList.add('hidden');
+        }
       }
     }
     
@@ -847,9 +979,74 @@
         updateDiary();
       });
       
-      // 重新开始游戏
-      uiElements.restartGameBtn.addEventListener('click', () => {
-        restartGame();
+      // 求婚按钮
+      uiElements.proposeBtn.addEventListener('click', () => {
+        if (gameData.currentCharacter !== null) {
+          const character = gameData.characters[gameData.currentCharacter];
+          uiElements.proposeCharacterName.textContent = character.name;
+          showSection('propose');
+        }
+      });
+      
+      // 接受求婚
+      uiElements.acceptPropose.addEventListener('click', () => {
+        if (gameData.currentCharacter !== null) {
+          const characterId = gameData.currentCharacter;
+          const character = gameData.characters[characterId];
+          
+          // 标记为后宫成员
+          character.isHarem = true;
+          if (!gameData.harem.includes(characterId)) {
+            gameData.harem.push(characterId);
+          }
+          
+          // 更新头像为后宫专属头像
+          characterElements.detailImage.src = character.haremImage;
+          
+          // 显示结局页面
+          showEndingPage();
+        }
+      });
+      
+      // 取消求婚
+      uiElements.cancelPropose.addEventListener('click', () => {
+        showSection('dialog');
+      });
+      
+      // 继续游戏（从结局页面）
+      uiElements.continueGameBtn.addEventListener('click', () => {
+        // 进入下一周目
+        gameData.week++;
+        
+        // 重置当前角色和天数，但保留金钱和后宫
+        gameData.currentCharacter = null;
+        gameData.day = 1;
+        
+        // 重置其他角色的好感度
+        gameData.characters.forEach(character => {
+          if (!character.isHarem) {
+            character.affection = 0;
+          }
+        });
+        
+        // 重置线索和互动
+        gameData.clues = [];
+        gameData.interactions = [];
+        
+        // 重置红润模式
+        gameData.blushMode = { active: false, daysRemaining: 0, characterId: -1 };
+        
+        // 保存游戏
+        saveGame();
+        
+        // 更新后宫徽章
+        updateHaremBadges();
+        
+        // 更新后宫展示
+        updateHaremDisplay();
+        
+        // 显示角色选择页面
+        showCharacterSelectionPage();
       });
     }
     
@@ -870,7 +1067,7 @@
       const character = gameData.characters[characterId];
       
       // 更新角色信息
-      characterElements.detailImage.src = character.image;
+      characterElements.detailImage.src = character.isHarem ? character.haremImage : character.image;
       characterElements.detailName.textContent = character.name;
       characterElements.detailTitle.textContent = character.title;
       characterElements.affectionValue.textContent = `${character.affection}/100`;
@@ -893,24 +1090,11 @@
       hideAllPages();
       pages.ending.classList.remove('hidden');
       
-      // 确定结局
-      const character = gameData.characters[gameData.currentCharacter];
-      let ending = gameData.endings[0]; // 默认结局
-      
-      for (let i = gameData.endings.length - 1; i >= 0; i--) {
-        if (character.affection >= gameData.endings[i].affectionRequired) {
-          ending = gameData.endings[i];
-          break;
-        }
-      }
-      
       // 更新结局信息
-      uiElements.endingImage.src = ending.image;
-      uiElements.endingTitle.textContent = ending.title;
-      uiElements.endingDescription.textContent = ending.description;
-      
-      // 清除保存的游戏数据
-      localStorage.removeItem('loveSimulationGame');
+      const character = gameData.characters[gameData.currentCharacter];
+      uiElements.endingImage.src = character.haremImage;
+      uiElements.endingTitle.textContent = `${character.name}加入后宫`;
+      uiElements.endingDescription.textContent = `恭喜！你成功攻略了${character.name}，现在可以继续攻略其他角色了。`;
     }
     
     // 隐藏所有页面
@@ -945,7 +1129,7 @@
       dialogueBox.className = 'dialog-box';
       dialogueBox.innerHTML = `
         <div class="flex items-start">
-          <img src="${character.image}" alt="${character.name}" class="w-12 h-12 rounded-full object-cover mr-3">
+          <img src="${character.isHarem ? character.haremImage : character.image}" alt="${character.name}" class="w-12 h-12 rounded-full object-cover mr-3">
           <div>
             <div class="flex items-center mb-1">
               <span class="font-bold mr-2">${character.name}</span>
@@ -967,27 +1151,31 @@
         button.className = 'btn-outline text-left';
         button.textContent = option.text;
         button.addEventListener('click', () => {
+          // 计算好感度变化（考虑红润模式）
+          let affectionChange = option.affectionChange;
+          if (gameData.blushMode.active && gameData.blushMode.characterId === gameData.currentCharacter) {
+            affectionChange *= 2;
+          }
+          
           // 更新好感度
-          character.affection += option.affectionChange;
+          character.affection += affectionChange;
           if (character.affection > 100) character.affection = 100;
           if (character.affection < 0) character.affection = 0;
           
           // 记录互动
-          recordInteraction(`对话中选择了"${option.text}"`, character.name, option.affectionChange);
+          recordInteraction(`对话中选择了"${option.text}"`, character.name, affectionChange);
           
           // 根据选项内容提供线索
           provideClueBasedOnDialogue(character.id, option.text, option.affectionChange);
           
-          // 更新好感UI
+          // 更新UI
           updateUI();
           
           // 保存游戏
           saveGame();
           
-          // 检查是否达成结局
-          if (checkEnding()) {
-            return;
-          }
+          // 减少红润模式天数
+          updateBlushMode();
           
           // 切换到下一个对话
           gameState.currentDialogueId = (gameState.currentDialogueId + 1) % character.dialogues.length;
@@ -1071,7 +1259,12 @@
             // 检查角色是否喜欢这个礼物
             const character = gameData.characters[gameData.currentCharacter];
             const isLiked = gift.likedBy.includes(character.id);
-            const affectionChange = isLiked ? gift.affectionChange * 2 : gift.affectionChange;
+            
+            // 计算好感度变化（考虑红润模式）
+            let affectionChange = isLiked ? gift.affectionChange * 2 : gift.affectionChange;
+            if (gameData.blushMode.active && gameData.blushMode.characterId === gameData.currentCharacter) {
+              affectionChange *= 2;
+            }
             
             // 增加好感度
             character.affection += affectionChange;
@@ -1094,10 +1287,8 @@
             // 保存游戏
             saveGame();
             
-            // 检查是否达成结局
-            if (checkEnding()) {
-              return;
-            }
+            // 减少红润模式天数
+            updateBlushMode();
             
             // 增加天数
             gameData.day++;
@@ -1158,6 +1349,11 @@
           
           // 增加天数
           gameData.day += job.time;
+          
+          // 更新红润模式
+          for (let i = 0; i < job.time; i++) {
+            updateBlushMode();
+          }
           
           // 更新UI
           updateUI();
@@ -1240,42 +1436,15 @@
       }, 3000);
     }
     
-    // 检查是否达成结局
-    function checkEnding() {
-      // 游戏天数超过30天，或者好感度达到100，结束游戏
-      if (gameData.day > 30 || (gameData.currentCharacter !== null && gameData.characters[gameData.currentCharacter].affection >= 100)) {
-        showEndingPage();
-        return true;
+    // 更新红润模式状态
+    function updateBlushMode() {
+      if (gameData.blushMode.active) {
+        gameData.blushMode.daysRemaining--;
+        if (gameData.blushMode.daysRemaining <= 0) {
+          gameData.blushMode.active = false;
+          gameData.blushMode.characterId = -1;
+        }
       }
-      return false;
-    }
-    
-    // 重新开始游戏
-    function restartGame() {
-      // 重置游戏数据
-      gameData.money = 500;
-      gameData.day = 1;
-      gameData.currentCharacter = null;
-      gameData.clues = [];
-      gameData.interactions = [];
-      
-      // 重置角色数据
-      gameData.characters.forEach(character => {
-        character.affection = 0;
-      });
-      
-      // 重置游戏状态
-      gameState.currentDialogueId = 0;
-      gameState.currentSection = 'dialog';
-      
-      // 保存游戏
-      saveGame();
-      
-      // 更新UI
-      updateUI();
-      
-      // 显示角色选择页面
-      showCharacterSelectionPage();
     }
     
     // 添加线索
@@ -1391,19 +1560,39 @@
       const dateContainer = sections.date.querySelector('.grid');
       dateContainer.innerHTML = '';
       
+      const character = gameData.characters[gameData.currentCharacter];
+      
       gameData.dates.forEach(date => {
-        const dateCard = document.createElement('div');
-        dateCard.className = 'job-card';
+        // 检查是否满足约会要求
+        let isAvailable = true;
+        if (date.requiresAffection && character.affection < date.requiresAffection) {
+          isAvailable = false;
+        }
         
         // 检查是否买得起
         const isAffordable = gameData.money >= date.price;
         
+        const dateCard = document.createElement('div');
+        dateCard.className = 'job-card';
+        
+        // 酒店约会特殊样式
+        if (date.name === "酒店") {
+          dateCard.classList.add('border-love');
+        }
+        
+        let unavailableReason = '';
+        if (!isAvailable) {
+          unavailableReason = `需要好感度达到${date.requiresAffection}`;
+        } else if (!isAffordable) {
+          unavailableReason = '资金不足';
+        }
+        
         dateCard.innerHTML = `
           <div class="flex items-center mb-2">
-            <i class="fa fa-heart text-accent mr-2"></i>
-            <h4 class="font-bold">${date.name}</h4>
+            <i class="fa fa-heart ${date.name === "酒店" ? 'text-love' : 'text-accent'} mr-2"></i>
+            <h4 class="font-bold ${date.name === "酒店" ? 'text-love' : ''}">${date.name}</h4>
           </div>
-          <p class="text-sm text-gray-600 mb-2">${date.description}</p>
+          <p class="text-sm text-gray-600 mb-2">${date.description} ${!isAvailable ? `<br><span class="text-red-500">${unavailableReason}</span>` : ''}</p>
           <div class="flex justify-between items-center">
             <div class="flex items-center">
               <i class="fa fa-clock-o text-gray-500 mr-1"></i>
@@ -1417,15 +1606,27 @@
         `;
         
         // 添加点击事件
-        if (isAffordable) {
+        if (isAvailable && isAffordable) {
           dateCard.addEventListener('click', () => {
             // 消耗金钱
             gameData.money -= date.price;
             
             // 检查角色是否喜欢这个约会地点
-            const character = gameData.characters[gameData.currentCharacter];
             const isLiked = date.likedBy.includes(character.id);
-            const affectionChange = isLiked ? 5 + Math.floor(Math.random() * 5) : 1 + Math.floor(Math.random() * 3);
+            
+            // 计算基础好感度变化
+            let baseAffectionChange = isLiked ? 5 + Math.floor(Math.random() * 5) : 1 + Math.floor(Math.random() * 3);
+            
+            // 酒店约会有特殊加成
+            if (date.name === "酒店") {
+              baseAffectionChange = 15 + Math.floor(Math.random() * 10);
+            }
+            
+            // 考虑红润模式
+            let affectionChange = baseAffectionChange;
+            if (gameData.blushMode.active && gameData.blushMode.characterId === gameData.currentCharacter) {
+              affectionChange *= 2;
+            }
             
             // 增加好感度
             character.affection += affectionChange;
@@ -1442,19 +1643,26 @@
               addClue(`${character.name}似乎喜欢去${date.name}`, character.id);
             }
             
+            // 处理特殊效果（如酒店约会触发红润模式）
+            if (date.specialEffect === "blushMode") {
+              gameData.blushMode = {
+                active: true,
+                daysRemaining: 3,
+                characterId: character.id
+              };
+            }
+            
             // 更新UI
             updateUI();
             
             // 保存游戏
             saveGame();
             
-            // 检查是否达成结局
-            if (checkEnding()) {
-              return;
+            // 增加天数并更新红润模式
+            for (let i = 0; i < date.time; i++) {
+              updateBlushMode();
+              gameData.day++;
             }
-            
-            // 增加天数
-            gameData.day += date.time;
             
             // 更新UI
             updateUI();
@@ -1478,12 +1686,12 @@
     // 显示约会成功提示
     function showDateSuccess(dateName, reaction) {
       const notification = document.createElement('div');
-      notification.className = 'fixed top-4 right-4 px-4 py-2 rounded-lg bg-accent text-white max-w-xs';
+      notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg ${dateName === "酒店" ? 'bg-love' : 'bg-accent'} text-white max-w-xs`;
       notification.innerHTML = `
         <div class="flex items-start">
           <i class="fa fa-heart mr-2 mt-1"></i>
           <div>
-            <p class="font-bold">约会成功！</p>
+            <p class="font-bold">${dateName === "酒店" ? '浪漫约会' : '约会'}成功！</p>
             <p class="text-sm">${reaction}</p>
           </div>
         </div>
@@ -1577,19 +1785,25 @@
         button.className = 'btn-outline text-left';
         button.textContent = option.text;
         button.addEventListener('click', () => {
+          // 计算好感度变化（考虑红润模式）
+          let affectionChange = option.affectionChange;
+          if (gameData.blushMode.active && gameData.blushMode.characterId === gameData.currentCharacter) {
+            affectionChange *= 2;
+          }
+          
           // 更新好感度
-          character.affection += option.affectionChange;
+          character.affection += affectionChange;
           if (character.affection > 100) character.affection = 100;
           if (character.affection < 0) character.affection = 0;
           
           // 记录互动
-          recordInteraction(`在"${event.title}"事件中选择了"${option.text}"`, character.name, option.affectionChange);
+          recordInteraction(`在"${event.title}"事件中选择了"${option.text}"`, character.name, affectionChange);
           
           // 显示事件结果提示
           let feeling = '';
-          if (option.affectionChange > 3) feeling = '非常开心';
-          else if (option.affectionChange > 0) feeling = '很开心';
-          else if (option.affectionChange === 0) feeling = '没有特别感觉';
+          if (affectionChange > 3) feeling = '非常开心';
+          else if (affectionChange > 0) feeling = '很开心';
+          else if (affectionChange === 0) feeling = '没有特别感觉';
           else feeling = '不太开心';
           
           showEventResult(event.title, feeling);
@@ -1639,6 +1853,37 @@
           document.body.removeChild(notification);
         }, 300);
       }, 3000);
+    }
+    
+    // 更新后宫徽章
+    function updateHaremBadges() {
+      gameData.harem.forEach(characterId => {
+        const badge = document.querySelector(`.harem-badge[data-character="${characterId}"]`);
+        if (badge) {
+          badge.classList.remove('hidden');
+        }
+      });
+    }
+    
+    // 更新后宫展示
+    function updateHaremDisplay() {
+      if (gameData.harem.length > 0) {
+        uiElements.haremSection.classList.remove('hidden');
+        uiElements.haremContainer.innerHTML = '';
+        
+        gameData.harem.forEach(characterId => {
+          const character = gameData.characters[characterId];
+          const haremItem = document.createElement('div');
+          haremItem.className = 'flex items-center bg-white rounded-lg shadow p-2';
+          haremItem.innerHTML = `
+            <img src="${character.haremImage}" alt="${character.name}" class="w-10 h-10 rounded-full object-cover mr-2">
+            <span>${character.name}</span>
+          `;
+          uiElements.haremContainer.appendChild(haremItem);
+        });
+      } else {
+        uiElements.haremSection.classList.add('hidden');
+      }
     }
     
     // 初始化游戏
